@@ -1,0 +1,78 @@
+.bg-custom {
+    background: linear-gradient(to bottom, #EAFEFF 0%, #ffffff 70%, #ffffff 100%);
+}
+
+.btn-custom {
+    background-color: #049FFF;
+    border-color: #049FFF;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #0380e0;
+    border-color: #0380e0;
+}
+
+.form-check-input:checked {
+    background-color: #049FFF;
+    border-color: #049FFF;
+}
+
+section {
+    min-height: 100vh;
+    background: linear-gradient(to top, rgba(4, 159, 255, 0.251) 0%, rgba(255, 255, 255, 0) 60%);
+}
+
+.floating-label-container {
+    position: relative;
+}
+
+.floating-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(-50%);
+    background: white;
+    padding: 0 8px;
+    margin-left: 10px;
+    font-size: 0.875rem;
+    color: #049FFF;
+    z-index: 2;
+}
+
+.floating-input {
+    border: 2px solid #049FFF !important;
+    outline: none !important;
+    padding-top: 1.2rem;
+    background: transparent;
+}
+
+.floating-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(4, 159, 255, 0.25);
+}
+
+.login-divider {
+    position: relative;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.login-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #dee2e6;
+    z-index: 1;
+}
+
+.login-divider span {
+    background: white;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+    color: #6c757d;
+    font-size: 0.875rem;
+}

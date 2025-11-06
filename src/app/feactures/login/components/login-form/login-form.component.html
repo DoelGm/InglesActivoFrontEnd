@@ -1,0 +1,71 @@
+    <section>
+        <div class="row">
+            <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+                <div class="card shadow p-5 bg-custom  rounded-4" style="width: 100%; max-width: 500px; border: 1px solid #049FFF;">
+                    <h4 class="text-center mb-2" style="color: #049FFF">Welcome to Ingles Activo</h4>
+                    <span class="text-secondary small text-center d-block">Login to access your travelwise account</span>
+
+                    <form class="mt-4">
+                        <!-- Email Input -->
+                        <div class="mb-3 floating-label-container">
+                            <div class="form-control position-relative p-0" style="background: transparent; border: none;">
+                                <label for="email" class="floating-label">Email</label>
+                                <input type="email" class="floating-input w-100 rounded" id="email" placeholder="nombre@ejemplo.com" required style="padding-left: 12px; padding-right: 12px;">
+                            </div>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="mb-3 floating-label-container">
+                            <div class="form-control position-relative p-0" style="background: transparent; border: none;">
+                                <label for="password" class="floating-label">Password</label>
+                                <input type="password" class="floating-input w-100 rounded" id="password" placeholder="••••••••" required style="padding-left: 12px; padding-right: 12px;">
+                            </div>
+                        </div>
+
+                        <!-- Remember me & Forgot password -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                                    <label class="form-check-label small" for="rememberMe">
+                                        Remember me
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <a href="#" class="text-decoration-none small" style="color: #ff0404;">Forgot password?</a>
+                            </div>
+                        </div>
+
+                        <!-- Login Button -->
+                        <button type="button" class="btn btn-custom w-100 mb-3" (click)="goHome()">Login</button>
+
+                        <!-- Sign up link -->
+                        <div class="text-center mb-4">
+                            <span class="text-secondary small">Don't have an account? </span>
+                            <a href="#" class="text-decoration-none small" style="color: #ff0404;">Sign up</a>
+                        </div>
+
+                        <!-- Or login with divider -->
+                        <div class="login-divider">
+                            <span>Or login with</span>
+                        </div>
+
+                        <!-- Social login buttons -->
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary w-100 small">
+                                    <img src="/assets/imgs/google.svg" alt="facebook" style="width: 20%;">
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary w-100 small">
+                                    <img src="/assets/imgs/facebook.svg" alt="google" style="width: 20%;;">
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>

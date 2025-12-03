@@ -11,7 +11,7 @@ import { SidebarComponent } from '../../components/sidebar/sidebar.component';
     <app-navbar></app-navbar>
       <div class="row">
           <div class="col-md-2 d-flex">
-            <app-sidebar class="bg-body-secondary rounded bg-opacity-50 text-dark p-3" style="min-width: 300px;"></app-sidebar>
+            <app-sidebar class="bg-body-secondary rounded bg-opacity-50 text-dark p-3" style="min-width 320px;"></app-sidebar>
           </div>
           <div class="col-md-7 d-flex flex-column">
               <router-outlet></router-outlet>

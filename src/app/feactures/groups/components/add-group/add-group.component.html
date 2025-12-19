@@ -1,0 +1,39 @@
+<section>
+    <div class="row">
+        <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
+            <div class="card mb-4 shadow-sm p-3">
+            <div class="card-header py-3" style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);border-radius: 13px 13px 0 0 !important;">
+                <h5 class="mb-0 text-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-plus-fill me-2"></i>Create new group</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form>
+                <div class="mb-3">
+                    <label for="groupName" class="form-label fw-bold">Group Name</label>
+                    <input type="text" class="form-control" id="groupName" placeholder="Enter group name">
+                </div>
+                <div class="">
+                    <label for="courseSelect" class="form-label fw-bold">Select Course</label>
+                    <select class="form-select" id="courseSelect">
+                    <option selected>Select a course</option>
+                    <option value="1">Web Development</option>
+                    <option value="2">Data Science</option>
+                    <option value="3">Digital Marketing</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="groupImage" class="form-label fw-bold mt-3">Group Image</label>
+                    <input type="file" class="form-control mt-3" id="groupImage" />
+                </div>
+                <div class="mb-3">
+                    <label for="groupDescription" class="form-label fw-bold">Group Description</label>
+                    <textarea class="form-control" id="groupDescription" rows="3" placeholder="Enter group description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Group</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+</section>

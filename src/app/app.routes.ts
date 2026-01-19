@@ -7,6 +7,7 @@ import { GroupPageComponent } from './feactures/groups/pages/group-page/group-pa
 import { StudentsComponent } from './feactures/admin/components/students/students.component';
 import { AddStudentsComponent } from './feactures/admin/components/add-students/add-students.component';
 import { AddGroupComponent } from './feactures/groups/components/add-group/add-group.component';
+import { AdminPageComponent } from './feactures/admin/pages/admin-page/admin-page.component';
 
 export const routes: Routes = [
     {
@@ -15,24 +16,24 @@ export const routes: Routes = [
   },
 
   // PUBLIC LAYOUT
-//   {
-//     path: '',
-//     component: PublicComponent,
-//     children: [
-//       { path: 'home', component: HomePageComponent },
-//       { path: 'groups', component: GroupPageComponent },
-//       { path: 'students', component: StudentsComponent },
-//       { path: 'addStudents', component: AddStudentsComponent },
-//       { path: 'addGroup', component: AddGroupComponent }
-//     ]
-//   },
+   {
+    path: '',
+    component: PublicComponent,
+    children: [
+      { path: 'home', component: HomePageComponent },
+      { path: 'groups', component: GroupPageComponent }
+    ]
+  },
 
-    // {
-    //     path: 'admin',
-    //     component: AdminComponent,
-    //     children: [
-    //         {}
-    //     ]
-    // },
+    {
+        path: 'admin',
+        component: AdminComponent,
+        children: [
+            { path: 'home', component: HomePageComponent },
+            { path: 'students', component: StudentsComponent },
+            { path: 'addStudents', component: AddStudentsComponent },
+            { path: 'addGroup', component: AddGroupComponent }
+        ]
+    },
     
 ];

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { MenuAdminComponent } from  '../../../../feactures/home/components/menu-admin/menu-admin.component';
+import { MenuAdminComponent } from  '../../../../feactures/admin/components/menu-admin/menu-admin.component';
 
 @Component({
   standalone: true,

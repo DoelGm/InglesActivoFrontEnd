@@ -7,7 +7,8 @@ import { GroupPageComponent } from './feactures/groups/pages/group-page/group-pa
 import { StudentsComponent } from './feactures/admin/components/students/students.component';
 import { AddStudentsComponent } from './feactures/admin/components/add-students/add-students.component';
 import { AddGroupComponent } from './feactures/groups/components/add-group/add-group.component';
-import { AdminPageComponent } from './feactures/admin/pages/admin-page/admin-page.component';
+import { GroupDetailComponent } from './feactures/groups/components/group-detail/group-detail.component';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
     {
@@ -21,19 +22,25 @@ export const routes: Routes = [
     component: PublicComponent,
     children: [
       { path: 'home', component: HomePageComponent },
-      { path: 'groups', component: GroupPageComponent }
+      { path: 'groups', component: GroupPageComponent },
+      { path: 'groups/:id', component: GroupDetailComponent }
     ]
   },
 
     {
-        path: 'admin',
-        component: AdminComponent,
-        children: [
-            { path: 'home', component: HomePageComponent },
-            { path: 'students', component: StudentsComponent },
-            { path: 'addStudents', component: AddStudentsComponent },
-            { path: 'addGroup', component: AddGroupComponent }
-        ]
-    },
+  path: 'admin',
+  canActivate: [AdminGuard],
+  component: AdminComponent,
+  children: [
+    { path: '', redirectTo: 'home', pathMatch: 'full' },
+    { path: 'home', component: HomePageComponent },
+    { path: 'students', component: StudentsComponent },
+    { path: 'addStudents', component: AddStudentsComponent },
+    { path: 'addGroup', component: AddGroupComponent },
+    { path: 'groups', component: GroupPageComponent },
+    { path: 'groups/:id', component: GroupDetailComponent }
+  ]
+}
+
     
 ];

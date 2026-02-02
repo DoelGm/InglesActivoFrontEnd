@@ -10,3 +10,13 @@
 .custom-nav {
   background-color: #00BBFF !important;
 }
+
+.nav-link-custom {
+  transition: transform 0.2s ease;
+}
+
+.nav-link-custom:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+

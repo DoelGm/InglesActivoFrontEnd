@@ -3,6 +3,14 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoginService } from '../../services/login.service';
 import { FormsModule } from '@angular/forms';
+import {jwtDecode } from 'jwt-decode';
+
+interface TokenPayload {
+  role: string;
+  email: string;
+  exp: number;
+}
+
 
 @Component({
   selector: 'app-login-form',
@@ -11,21 +19,49 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./login-form.component.css'] // también estaba mal: debe ser style**s**Url**s**
 })
 export class LoginFormComponent {
+  email: string = '';
+  password: string = '';
+  errorMsg: string = '';
+  isLoading: boolean = false;
+
   constructor(
     private router: Router,
     private loginService: LoginService
   ) {}
-  email: string = '';
-  password: string = '';
-  errorMsg: string = '';
-   isLoading: boolean = false;
 
-  login() {
-    this.loginService.login(this.email, this.password).subscribe(
-      (response) => {
-        console.log('Login exitoso', response);
+ login() {
+  this.isLoading = true;
+  this.errorMsg = '';
+
+  this.loginService.login(this.email, this.password).subscribe(
+    (response: any) => {
+      console.log('RESPUESTA DEL BACKEND:', response);
+
+      if (!response || !response.access_token) {
+        this.isLoading = false;
+        this.errorMsg = 'Credenciales incorrectas';
+        return;
+      }
+
+      const token = response.access_token;
+      localStorage.setItem('token', token);
+
+      const decoded = jwtDecode<any>(token);
+
+      console.log('TOKEN:', token);
+      console.log('DECODED:', decoded);
+      console.log('ROL DECODIFICADO:', decoded.role);
+
+      localStorage.setItem('role', decoded.role);
+
+      if (decoded.role === 'admin') {
+        this.router.navigate(['/admin']);
+      } else {
         this.router.navigate(['/home']);
-      },
+      }
+
+      this.isLoading = false;
+    },
       (error) => {
         console.error('Error de login', error);
         this.isLoading = false;

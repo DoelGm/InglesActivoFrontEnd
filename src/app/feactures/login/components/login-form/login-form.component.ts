@@ -23,6 +23,8 @@ export class LoginFormComponent {
   password: string = '';
   errorMsg: string = '';
   isLoading: boolean = false;
+  showPassword: boolean = false;
+
 
   constructor(
     private router: Router,
@@ -32,10 +34,10 @@ export class LoginFormComponent {
  login() {
   this.isLoading = true;
   this.errorMsg = '';
+  
 
   this.loginService.login(this.email, this.password).subscribe(
     (response: any) => {
-      console.log('RESPUESTA DEL BACKEND:', response);
 
       if (!response || !response.access_token) {
         this.isLoading = false;
@@ -48,17 +50,22 @@ export class LoginFormComponent {
 
       const decoded = jwtDecode<any>(token);
 
-      console.log('TOKEN:', token);
-      console.log('DECODED:', decoded);
-      console.log('ROL DECODIFICADO:', decoded.role);
-
       localStorage.setItem('role', decoded.role);
 
-      if (decoded.role === 'admin') {
+     switch (decoded.role) {
+      case 'admin':
         this.router.navigate(['/admin']);
-      } else {
+        break;
+
+      case 'teacher':
+        this.router.navigate(['/teacher']);
+        break;
+
+      default:
         this.router.navigate(['/home']);
-      }
+        break;
+    }
+
 
       this.isLoading = false;
     },

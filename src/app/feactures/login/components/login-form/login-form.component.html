@@ -24,22 +24,38 @@
                             </div>
                         </div>
 
-                        <!-- Password Input -->
-                        <div class="mb-3 floating-label-container">
-                            <div class="form-control position-relative p-0" style="background: transparent; border: none;">
-                                <label for="password" class="floating-label">Password</label>
-                               <input
-                type="password"
-                class="floating-input w-100 rounded"
-                id="password"
-                name="password"
-                [(ngModel)]="password"
-                placeholder="••••••••"
-                required
-                style="padding-left: 12px; padding-right: 12px;"
-              />
-                            </div>
-                        </div>
+                <!-- Password Input -->
+                <div class="mb-3 floating-label-container">
+                <div class="form-control position-relative p-0"
+                    style="background: transparent; border: none;">
+
+                    <label for="password" class="floating-label">Password</label>
+
+                    <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="floating-input w-100 rounded"
+                    id="password"
+                    name="password"
+                    [(ngModel)]="password"
+                    placeholder="••••••••"
+                    required
+                    style="padding-left: 12px; padding-right: 42px;"
+                    />
+
+                    <!-- OJITO -->
+                    <button
+                    type="button"
+                    class="btn position-absolute top-50 end-0 translate-middle-y me-2 p-0"
+                    (click)="showPassword = !showPassword"
+                    tabindex="-1"
+                    style="border: none; background: transparent;">
+                    <i class="bi"
+                        [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+
+                </div>
+                </div>
+
 
                         <!-- Remember me & Forgot password -->
                         <div class="row mb-3">

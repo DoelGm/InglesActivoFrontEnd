@@ -4,7 +4,7 @@ import { MenuAdminComponent } from "../../../admin/components/menu-admin/menu-ad
 
 @Component({
   selector: 'app-home-page',
-  imports: [NoticeCardComponent, MenuAdminComponent],
+  imports: [NoticeCardComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
 })

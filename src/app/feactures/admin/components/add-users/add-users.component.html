@@ -1,0 +1,108 @@
+<section>
+  <div class="row">
+    <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
+      <div class="card mb-4 shadow-sm p-3">
+        <div
+          class="card-header py-3"
+          style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);
+                 border-radius: 13px 13px 0 0 !important;">
+          <h5 class="mb-0 text-white fw-bold">
+            <i class="bi bi-person-plus-fill me-2"></i>Registrar Usuario
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <!-- ALERTAS -->
+          <div *ngIf="alertMessage" class="alert mt-3"
+               [ngClass]="{
+                 'alert-success': alertType === 'success',
+                 'alert-danger': alertType === 'error',
+                 'alert-warning': alertType === 'warning'
+               }">
+            {{ alertMessage }}
+          </div>
+
+          <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nombre</label>
+              <input type="text" class="form-control" formControlName="first_name" placeholder="Nombre">
+            </div>
+
+            <!-- Apellido -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Apellido</label>
+              <input type="text" class="form-control" formControlName="last_name" placeholder="Apellido">
+            </div>
+
+            <!-- Correo -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Correo</label>
+              <input type="email" class="form-control" formControlName="email" placeholder="correo@ejemplo.com">
+            </div>
+
+            <!-- Validación Email -->
+            <div *ngIf="userForm.get('email')?.touched && userForm.get('email')?.errors"
+                 class="text-danger small mt-1">
+              <span *ngIf="userForm.get('email')?.errors?.['required']">
+                El correo es obligatorio.
+              </span>
+              <span *ngIf="userForm.get('email')?.errors?.['email']">
+                Ingresa un correo válido.
+              </span>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Contraseña</label>
+              <div class="input-group">
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="Contraseña">
+                <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword">
+                  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
+              <small class="text-muted">Mínimo 6 caracteres</small>
+              <div *ngIf="userForm.get('password')?.touched && userForm.get('password')?.errors?.['minlength']" class="text-danger small">
+                La contraseña debe tener al menos 6 caracteres.
+              </div>
+            </div>
+
+            <!-- Rol -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Rol</label>
+              <select class="form-select" formControlName="role">
+                <option value="">Seleccione un rol</option>
+                <option value="student">Estudiante</option>
+                <option value="teacher">Profesor</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+
+            <!-- Campos condicionales según rol -->
+            <!-- Estudiante -->
+            <div *ngIf="userForm.get('role')?.value === 'student'">
+              <div class="mb-3">
+                <label class="form-label fw-bold">Curso</label>
+                <input type="text" class="form-control" formControlName="course" placeholder="Curso">
+              </div>
+            </div>
+
+            <!-- Profesor -->
+            <div *ngIf="userForm.get('role')?.value === 'teacher'">
+              <div class="mb-3">
+                <label class="form-label fw-bold">Especialidad</label>
+                <input type="text" class="form-control" formControlName="specialty" placeholder="Especialidad">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid">
+              Registrar
+            </button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

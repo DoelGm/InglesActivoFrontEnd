@@ -72,6 +72,18 @@
                             </div>
                         </div>
 
+                        <!-- reCAPTCHA -->
+
+                        <div class="mb-3 text-center">
+                        <div
+                            class="g-recaptcha"
+                            [attr.data-sitekey]="siteKey"
+                            data-callback="onCaptchaSuccess">
+                        </div>
+                        </div>
+
+
+
                                  <!-- Mensaje de Error -->
                     <div *ngIf="errorMsg" class="alert alert-danger alert-dismissible fade show" role="alert">
                         <div class="d-flex align-items-center">

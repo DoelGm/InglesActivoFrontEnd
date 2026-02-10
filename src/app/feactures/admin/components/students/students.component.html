@@ -20,75 +20,66 @@
                   <th class="text-end">Delete</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
+              <tbody *ngIf="!loading && students.length > 0">
+                <tr *ngFor="let student of students">
                   <td>
                     <div class="d-flex align-items-center">
-                      <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 0.9rem">
-                        AJ
+                      <div
+                        class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center"
+                        style="width: 36px; height: 36px; font-size: 0.9rem">
+                        {{ getInitials(student.name) }}
                       </div>
                       <div class="ms-3">
-                        <p class="fw-bold mb-0">Ana Johnson</p>
-                        <p class="text-muted mb-0 small">asddefedfedf</p>
+                        <p class="fw-bold mb-0">{{ student.name }}</p>
+                        <p class="text-muted mb-0 small">{{ student.email }}</p>
                       </div>
                     </div>
                   </td>
-                  <td>Web Development</td>
-                  <td><span class="badge bg-success">Active</span></td>
+
+                  <td>{{ student.course }}</td>
+
+                  <td>
+                    <span
+                      class="badge"
+                      [ngClass]="{
+                        'bg-success': student.status === 'ACTIVE',
+                        'bg-warning': student.status === 'PENDING',
+                        'bg-danger': student.status === 'INACTIVE'
+                      }">
+                      {{ student.status }}
+                    </span>
+                  </td>
+
                   <td class="text-end">
                     <button class="btn btn-sm btn-outline-primary">
                       <i class="bi bi-pencil"></i> Edit
                     </button>
                   </td>
+
                   <td class="text-end">
                     <button class="btn btn-sm btn-outline-danger">
                       <i class="bi bi-trash"></i> Delete
                     </button>
                   </td>
                 </tr>
-                
+              </tbody>
+
+              <tbody *ngIf="loading">
                 <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 0.9rem">
-                        MS
-                      </div>
-                      <div class="ms-3">
-                        <p class="fw-bold mb-0">Michael Smith</p>
-                        <p class="text-muted mb-0 small">m.smi</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>Data Science</td>
-                  <td><span class="badge bg-success">Active</span></td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-outline-primary">
-                      <i class="bi bi-pencil"></i> Edit
-                    </button>
-                  </td>
-                </tr>
-                
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 0.9rem">
-                        ER
-                      </div>
-                      <div class="ms-3">
-                        <p class="fw-bold mb-0">Emma Rodriguez</p>
-                        <p class="text-muted mb-0 small">ttttttt</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>UX Design</td>
-                  <td><span class="badge bg-warning">Pending</span></td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-outline-primary">
-                      <i class="bi bi-pencil"></i> Edit
-                    </button>
+                  <td colspan="5" class="text-center py-4">
+                    Cargando estudiantes...
                   </td>
                 </tr>
               </tbody>
+
+              <tbody *ngIf="!loading && students.length === 0">
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">
+                    No hay estudiantes registrados
+                  </td>
+                </tr>
+              </tbody>
+
             </table>
           </div>
         </div>

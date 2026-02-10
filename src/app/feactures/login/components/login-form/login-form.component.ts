@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { LoginService } from '../../services/login.service';
 import { FormsModule } from '@angular/forms';
 import {jwtDecode } from 'jwt-decode';
+import { environment } from '../../../../../enviroment/environment';
 
 interface TokenPayload {
   role: string;
@@ -24,6 +25,9 @@ export class LoginFormComponent {
   errorMsg: string = '';
   isLoading: boolean = false;
   showPassword: boolean = false;
+  siteKey = environment.recaptchaSiteKey;
+   captchaToken: string = '';
+ 
 
 
   constructor(
@@ -31,7 +35,18 @@ export class LoginFormComponent {
     private loginService: LoginService
   ) {}
 
+  ngOnInit() {
+    (window as any).onCaptchaSuccess = (token: string) => {
+      this.captchaToken = token;
+    };
+  }
+
  login() {
+   if (!this.captchaToken) {
+    this.errorMsg = 'Por favor verifica el captcha.';
+    return;
+  }
+
   this.isLoading = true;
   this.errorMsg = '';
   

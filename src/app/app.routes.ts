@@ -5,10 +5,11 @@ import { HomePageComponent } from './feactures/home/pages/home-page/home-page.co
 import { LoginPageComponent } from './feactures/login/pages/login-page/login-page.component';
 import { GroupPageComponent } from './feactures/groups/pages/group-page/group-page.component';
 import { StudentsComponent } from './feactures/admin/components/students/students.component';
-import { AddStudentsComponent } from './feactures/admin/components/add-students/add-students.component';
 import { AddGroupComponent } from './feactures/groups/components/add-group/add-group.component';
 import { GroupDetailComponent } from './feactures/groups/components/group-detail/group-detail.component';
 import { AdminGuard } from './guards/admin.guard';
+import { AddUsersComponent } from './feactures/admin/components/add-users/add-users.component';
+import { AddNewsComponent } from './feactures/admin/components/add-news/add-news.component';
 
 export const routes: Routes = [
     {
@@ -35,8 +36,9 @@ export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: 'home', component: HomePageComponent },
     { path: 'students', component: StudentsComponent },
-    { path: 'addStudents', component: AddStudentsComponent },
+    { path: 'addUsers', component: AddUsersComponent },
     { path: 'addGroup', component: AddGroupComponent },
+    { path: 'addNews', component: AddNewsComponent },
     { path: 'groups', component: GroupPageComponent },
     { path: 'groups/:id', component: GroupDetailComponent }
   ]

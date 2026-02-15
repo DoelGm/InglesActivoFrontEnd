@@ -1,14 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { StudenService } from '../../services/studen.service';
-import { Observable, switchMap } from 'rxjs';
+import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: 'app-add-users',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './add-users.component.html',
-  styleUrl: './add-users.component.css'
+  styleUrls: ['./add-users.component.css']
 })
 export class AddUsersComponent {
   showPassword = false;
@@ -16,15 +15,34 @@ export class AddUsersComponent {
   alertType: 'success' | 'error' | 'warning' | '' = '';
   userForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private studentService: StudenService) {
+  constructor(private fb: FormBuilder, private usersService: UsersService) {
     this.userForm = this.fb.group({
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['', Validators.required],
       course: [''],      // Solo para estudiantes
       specialty: ['']    // Solo para profesores
+    });
+
+    // Validación condicional
+    this.userForm.get('role')?.valueChanges.subscribe(role => {
+      const specialtyControl = this.userForm.get('specialty');
+      const courseControl = this.userForm.get('course');
+      
+      if (role === 'teacher') {
+        specialtyControl?.setValidators([Validators.required]);
+        courseControl?.clearValidators();
+      } else if (role === 'student') {
+        courseControl?.setValidators([Validators.required]);
+        specialtyControl?.clearValidators();
+      } else {
+        specialtyControl?.clearValidators();
+        courseControl?.clearValidators();
+      }
+      
+      specialtyControl?.updateValueAndValidity();
+      courseControl?.updateValueAndValidity();
     });
   }
 
@@ -44,50 +62,60 @@ export class AddUsersComponent {
       return;
     }
 
-    const { first_name, last_name, email, password, role, course, specialty } = this.userForm.value;
+    const formValues = this.userForm.value;
+    
+    // Construir payload exactamente como en Postman
+    const payload: any = {
+      first_name: formValues.first_name,
+      last_name: formValues.last_name,
+      email: formValues.email,
+      role: formValues.role
+    };
 
-    // 1️⃣ Crear el usuario primero
-    this.studentService.createUser({ first_name, last_name, email, password})
-      .pipe(
-        // 2️⃣ Según el rol, crear perfil adicional en students o teachers
-        switchMap((createdUser: any) => {
-          const userId = createdUser.id;
+    // Agregar campos específicos según el rol
+    if (formValues.role === 'teacher') {
+      payload.specialty = formValues.specialty;
+    }
+    
+    if (formValues.role === 'student') {
+      payload.course = formValues.course;
+    }
 
-          if (role === 'student') {
-            return this.studentService.createStudentProfile({ userId, course });
-          }
+    console.log('Enviando payload:', payload);
 
-          if (role === 'teacher') {
-            return this.studentService.createTeacherProfile({ userId, specialty });
-          }
+    // Elegir el endpoint correcto según el rol
+    let request;
+    if (formValues.role === 'teacher') {
+      request = this.usersService.createTeacher(payload);
+    } else if (formValues.role === 'student') {
+      request = this.usersService.createStudent(payload);
+    } else {
+      request = this.usersService.createAdmin(payload);
+    }
 
-          // Admin no necesita perfil adicional
-          return new Observable(observer => {
-            observer.next(createdUser);
-            observer.complete();
-          });
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.showAlert('Usuario registrado correctamente ✅', 'success');
-          this.userForm.reset();
-        },
-        error: (err) => {
-          if (err.status === 0) {
-            this.showAlert('No hay conexión con el servidor.', 'error');
-            return;
+    request.subscribe({
+      next: (response) => {
+        this.showAlert('Usuario registrado correctamente', 'success');
+        this.userForm.reset();
+        
+        this.userForm.patchValue({
+          role: '',
+          course: '',
+          specialty: ''
+        });
+      },
+      error: (err) => {
+        let errorMessage = 'Error al registrar el usuario.';
+        if (err.error?.message) {
+          if (Array.isArray(err.error.message)) {
+            errorMessage = err.error.message.join(', ');
+          } else {
+            errorMessage = err.error.message;
           }
-          if (err.status === 409 || err.error?.message?.includes('existe')) {
-            this.showAlert('El usuario ya existe.', 'warning');
-            return;
-          }
-          if (err.status === 400) {
-            this.showAlert('Datos inválidos proporcionados.', 'warning');
-            return;
-          }
-          this.showAlert('Error al registrar el usuario.', 'error');
         }
-      });
+        
+        this.showAlert(errorMessage, 'error');
+      }
+    });
   }
 }

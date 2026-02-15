@@ -10,6 +10,8 @@ import { GroupDetailComponent } from './feactures/groups/components/group-detail
 import { AdminGuard } from './guards/admin.guard';
 import { AddUsersComponent } from './feactures/admin/components/add-users/add-users.component';
 import { AddNewsComponent } from './feactures/admin/components/add-news/add-news.component';
+import { TeachersComponent } from './feactures/admin/components/teachers/teachers.component';
+import { AdminsComponent } from './feactures/admin/components/admins/admins.component';
 
 export const routes: Routes = [
     {
@@ -36,6 +38,8 @@ export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: 'home', component: HomePageComponent },
     { path: 'students', component: StudentsComponent },
+    { path: 'teachers', component: TeachersComponent },
+    { path: 'admins', component: AdminsComponent },
     { path: 'addUsers', component: AddUsersComponent },
     { path: 'addGroup', component: AddGroupComponent },
     { path: 'addNews', component: AddNewsComponent },

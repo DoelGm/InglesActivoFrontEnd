@@ -58,6 +58,7 @@ export class LoginFormComponent {
         this.isLoading = false;
         this.errorMsg = 'Credenciales incorrectas';
         return;
+        
       }
 
       const token = response.access_token;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../enviroment/environment';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 
 @Injectable({
@@ -10,13 +10,20 @@ export class LoginService {
 
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient) { }
-     
-    login(email: string, password: string) {
-    return this.http.post(`${this.apiUrl}/login`, {
-      email,
-      password,
-    })
+  constructor(private http: HttpClient) {}
+
+  login(email: string, password: string) {
+    const token = localStorage.getItem('token');
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    return this.http.post(
+      `${this.apiUrl}/login`,
+      { email, password },
+      { headers }
+    )
     .pipe(
         catchError((error: HttpErrorResponse) => {
           let errorMessage = 'Error desconocido';

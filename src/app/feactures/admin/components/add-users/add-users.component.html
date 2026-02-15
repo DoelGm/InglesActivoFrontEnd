@@ -53,21 +53,6 @@
               </span>
             </div>
 
-            <!-- Contraseña -->
-            <div class="mb-3">
-              <label class="form-label fw-bold">Contraseña</label>
-              <div class="input-group">
-                <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="Contraseña">
-                <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword">
-                  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
-                </button>
-              </div>
-              <small class="text-muted">Mínimo 6 caracteres</small>
-              <div *ngIf="userForm.get('password')?.touched && userForm.get('password')?.errors?.['minlength']" class="text-danger small">
-                La contraseña debe tener al menos 6 caracteres.
-              </div>
-            </div>
-
             <!-- Rol -->
             <div class="mb-3">
               <label class="form-label fw-bold">Rol</label>

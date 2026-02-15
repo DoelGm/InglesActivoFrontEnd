@@ -1,0 +1,228 @@
+<section>
+  <div class="container mt-4">
+    <div class="card shadow-sm">
+      <div class="card-header text-white"
+           style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="bi bi-person-badge-fill me-2"></i>
+            Administrators Management
+          </h5>
+          <button class="btn btn-danger btn-sm"
+                  (click)="confirmDeleteMultiple()"
+                  [disabled]="selectedIds.length === 0">
+            <i class="bi bi-trash"></i>
+            Delete selected
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- Filters -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Buscar por nombre"
+                   [(ngModel)]="filterName">
+          </div>
+          <div class="col-md-6">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Buscar por email"
+                   [(ngModel)]="filterEmail">
+          </div>
+        </div>
+
+        <div *ngIf="message"
+             class="alert mt-3"
+             [ngClass]="{
+               'alert-success': messageType === 'success',
+               'alert-danger': messageType === 'danger'
+             }">
+          {{ message }}
+          <button type="button" class="btn-close float-end" (click)="message=''"></button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th><input type="checkbox" (change)="toggleSelectAll($event)"></th>
+                <th>Administrator</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody *ngIf="filteredAdmins().length > 0">
+              <tr *ngFor="let admin of filteredAdmins()">
+                <td>
+                  <input type="checkbox"
+                         [checked]="selectedIds.includes(admin.id)"
+                         (change)="toggleSelection(admin.id)">
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-info text-white d-flex justify-content-center align-items-center"
+                         style="width:36px;height:36px;">
+                      {{ getInitials(admin.first_name + ' ' + admin.last_name) }}
+                    </div>
+                    <div class="ms-3 fw-semibold">
+                      {{ admin.first_name }} {{ admin.last_name }}
+                    </div>
+                  </div>
+                </td>
+                <td>{{ admin.email }}</td>
+                <td>
+                  <span class="badge"
+                        [ngClass]="{
+                          'bg-success': admin.is_active,
+                          'bg-danger': !admin.is_active
+                        }">
+                    {{ admin.is_active ? 'ACTIVE' : 'INACTIVE' }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-primary me-2"
+                          (click)="editAdmin(admin)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger"
+                          (click)="confirmDelete(admin)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+
+            <tbody *ngIf="filteredAdmins().length === 0">
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                  No hay administradores registrados
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal fade show"
+       *ngIf="selectedAdmin"
+       style="display:block;background:rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow">
+        <form #editForm="ngForm" (ngSubmit)="updateAdmin(editForm)">
+          <div class="modal-header bg-primary text-white rounded-top-4">
+            <h5 class="modal-title">Editar administrador</h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" name="first_name"
+                     [(ngModel)]="selectedAdmin.first_name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Apellido</label>
+              <input type="text" class="form-control" name="last_name"
+                     [(ngModel)]="selectedAdmin.last_name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="email"
+                     [(ngModel)]="selectedAdmin.email" required>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="is_active"
+                     [(ngModel)]="selectedAdmin.is_active">
+              <label class="form-check-label">Usuario activo</label>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE MODAL -->
+  <div class="modal fade show"
+       *ngIf="adminToDelete"
+       style="display:block;background:rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content rounded-4 shadow">
+        <div class="modal-header bg-danger text-white rounded-top-4">
+          <h6 class="modal-title">Confirmar eliminación</h6>
+          <button type="button" class="btn-close btn-close-white" (click)="closeDeleteModal()"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p>¿Eliminar a:</p>
+          <strong>{{ adminToDelete.first_name }} {{ adminToDelete.last_name }}</strong>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button class="btn btn-outline-secondary" (click)="closeDeleteModal()">Cancelar</button>
+          <button class="btn btn-danger" (click)="deleteConfirmed()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div *ngIf="loading"
+       class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+       style="background:rgba(255,255,255,0.7);z-index:2000;">
+    <div class="text-center">
+      <div class="spinner-border text-primary"
+           style="width:3rem;height:3rem;"></div>
+      <p class="mt-3 fw-semibold">Cargando...</p>
+    </div>
+  </div>
+
+  <!-- DELETE MULTIPLE MODAL -->
+  <div class="modal fade show"
+       *ngIf="deleteMultiple"
+       style="display:block; background:rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            Confirmar eliminación
+          </h5>
+          <button type="button" class="btn-close"
+                  (click)="closeDeleteMultiple()"></button>
+        </div>
+
+        <div class="modal-body text-center">
+          <p>
+            ¿Seguro que deseas eliminar
+            <strong>{{ selectedIds.length }}</strong>
+            administradores?
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary"
+                  (click)="closeDeleteMultiple()">
+            Cancelar
+          </button>
+          <button class="btn btn-danger"
+                  (click)="deleteSelected()">
+            Eliminar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

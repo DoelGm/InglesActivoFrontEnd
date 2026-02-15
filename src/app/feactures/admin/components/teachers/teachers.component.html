@@ -1,30 +1,23 @@
 <section>
-
   <div class="container mt-4">
-
     <div class="card shadow-sm">
-
       <div class="card-header text-white"
            style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);">
-
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="mb-0">
-            <i class="bi bi-people-fill me-2"></i>
-            Students Management
+            <i class="bi bi-person-badge-fill me-2"></i>
+            Teachers Management
           </h5>
-
-        <button class="btn btn-danger btn-sm"
-        (click)="confirmDeleteMultiple()"
-        [disabled]="selectedIds.length === 0">
+          <button class="btn btn-danger btn-sm"
+                  (click)="confirmDeleteMultiple()"
+                  [disabled]="selectedIds.length === 0">
             <i class="bi bi-trash"></i>
             Delete selected
           </button>
         </div>
-
       </div>
 
       <div class="card-body">
-
         <!-- Filters -->
         <div class="row mb-3">
           <div class="col-md-6">
@@ -33,7 +26,6 @@
                    placeholder="Buscar por nombre"
                    [(ngModel)]="filterName">
           </div>
-
           <div class="col-md-6">
             <input type="text"
                    class="form-control"
@@ -43,175 +35,121 @@
         </div>
 
         <div *ngIf="message"
-     class="alert mt-3"
-     [ngClass]="{
-       'alert-success': messageType === 'success',
-       'alert-danger': messageType === 'danger'
-     }">
-
-  {{ message }}
-
-  <button type="button"
-          class="btn-close float-end"
-          (click)="message=''">
-  </button>
-</div>
-
+             class="alert mt-3"
+             [ngClass]="{
+               'alert-success': messageType === 'success',
+               'alert-danger': messageType === 'danger'
+             }">
+          {{ message }}
+          <button type="button" class="btn-close float-end" (click)="message=''"></button>
+        </div>
 
         <!-- Table -->
         <div class="table-responsive">
           <table class="table table-hover align-middle">
-
             <thead class="table-light">
               <tr>
-                <th>
-                  <input type="checkbox"
-                         (change)="toggleSelectAll($event)">
-                </th>
-                <th>Student</th>
+                <th><input type="checkbox" (change)="toggleSelectAll($event)"></th>
+                <th>Teacher</th>
                 <th>Email</th>
                 <th>Status</th>
                 <th class="text-end">Actions</th>
               </tr>
             </thead>
 
-            <tbody *ngIf="filteredStudents().length > 0">
-              <tr *ngFor="let student of filteredStudents()">
-
+            <tbody *ngIf="filteredTeachers().length > 0">
+              <tr *ngFor="let teacher of filteredTeachers()">
                 <td>
                   <input type="checkbox"
-                         [checked]="selectedIds.includes(student.id)"
-                         (change)="toggleSelection(student.id)">
+                         [checked]="selectedIds.includes(teacher.id)"
+                         (change)="toggleSelection(teacher.id)">
                 </td>
-
                 <td>
                   <div class="d-flex align-items-center">
                     <div class="rounded-circle bg-info text-white d-flex justify-content-center align-items-center"
                          style="width:36px;height:36px;">
-                      {{ getInitials(student.first_name + ' ' + student.last_name) }}
+                      {{ getInitials(teacher.first_name + ' ' + teacher.last_name) }}
                     </div>
                     <div class="ms-3 fw-semibold">
-                      {{ student.first_name }} {{ student.last_name }}
+                      {{ teacher.first_name }} {{ teacher.last_name }}
                     </div>
                   </div>
                 </td>
-
-                <td>{{ student.email }}</td>
-
+                <td>{{ teacher.email }}</td>
                 <td>
                   <span class="badge"
                         [ngClass]="{
-                          'bg-success': student.is_active,
-                          'bg-danger': !student.is_active
+                          'bg-success': teacher.is_active,
+                          'bg-danger': !teacher.is_active
                         }">
-                    {{ student.is_active ? 'ACTIVE' : 'INACTIVE' }}
+                    {{ teacher.is_active ? 'ACTIVE' : 'INACTIVE' }}
                   </span>
                 </td>
-
                 <td class="text-end">
-
                   <button class="btn btn-sm btn-outline-primary me-2"
-                          (click)="editStudent(student)">
+                          (click)="editTeacher(teacher)">
                     <i class="bi bi-pencil"></i>
                   </button>
-
                   <button class="btn btn-sm btn-outline-danger"
-                          (click)="confirmDelete(student)">
+                          (click)="confirmDelete(teacher)">
                     <i class="bi bi-trash"></i>
                   </button>
-
                 </td>
-
               </tr>
             </tbody>
 
-            <tbody *ngIf="filteredStudents().length === 0">
+            <tbody *ngIf="filteredTeachers().length === 0">
               <tr>
                 <td colspan="5" class="text-center text-muted py-4">
-                  No hay estudiantes registrados
+                  No hay profesores registrados
                 </td>
               </tr>
             </tbody>
-
           </table>
         </div>
-
       </div>
     </div>
   </div>
 
   <!-- EDIT MODAL -->
   <div class="modal fade show"
-       *ngIf="selectedStudent"
+       *ngIf="selectedTeacher"
        style="display:block;background:rgba(0,0,0,0.5);">
-
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content rounded-4 shadow">
-
-        <form #editForm="ngForm"
-              (ngSubmit)="updateStudent(editForm)">
-
+        <form #editForm="ngForm" (ngSubmit)="updateTeacher(editForm)">
           <div class="modal-header bg-primary text-white rounded-top-4">
-            <h5 class="modal-title">Editar estudiante</h5>
-            <button type="button"
-                    class="btn-close btn-close-white"
-                    (click)="closeModal()"></button>
+            <h5 class="modal-title">Editar profesor</h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
           </div>
 
           <div class="modal-body">
-
             <div class="mb-3">
               <label class="form-label">Nombre</label>
-              <input type="text"
-                     class="form-control"
-                     name="first_name"
-                     [(ngModel)]="selectedStudent.first_name"
-                     required>
+              <input type="text" class="form-control" name="first_name"
+                     [(ngModel)]="selectedTeacher.first_name" required>
             </div>
-
             <div class="mb-3">
               <label class="form-label">Apellido</label>
-              <input type="text"
-                     class="form-control"
-                     name="last_name"
-                     [(ngModel)]="selectedStudent.last_name"
-                     required>
+              <input type="text" class="form-control" name="last_name"
+                     [(ngModel)]="selectedTeacher.last_name" required>
             </div>
-
             <div class="mb-3">
               <label class="form-label">Email</label>
-              <input type="email"
-                     class="form-control"
-                     name="email"
-                     [(ngModel)]="selectedStudent.email"
-                     required>
+              <input type="email" class="form-control" name="email"
+                     [(ngModel)]="selectedTeacher.email" required>
             </div>
-
             <div class="form-check form-switch">
-              <input class="form-check-input"
-                     type="checkbox"
-                     name="is_active"
-                     [(ngModel)]="selectedStudent.is_active">
-              <label class="form-check-label">
-                Usuario activo
-              </label>
+              <input class="form-check-input" type="checkbox" name="is_active"
+                     [(ngModel)]="selectedTeacher.is_active">
+              <label class="form-check-label">Usuario activo</label>
             </div>
-
           </div>
 
           <div class="modal-footer">
-            <button type="button"
-                    class="btn btn-outline-secondary"
-                    (click)="closeModal()">
-              Cancelar
-            </button>
-
-            <button type="submit"
-                    class="btn btn-primary">
-              Guardar
-            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
           </div>
-
         </form>
       </div>
     </div>
@@ -219,44 +157,27 @@
 
   <!-- DELETE MODAL -->
   <div class="modal fade show"
-       *ngIf="studentToDelete"
+       *ngIf="teacherToDelete"
        style="display:block;background:rgba(0,0,0,0.5);">
-
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content rounded-4 shadow">
-
         <div class="modal-header bg-danger text-white rounded-top-4">
           <h6 class="modal-title">Confirmar eliminación</h6>
-          <button type="button"
-                  class="btn-close btn-close-white"
-                  (click)="closeDeleteModal()"></button>
+          <button type="button" class="btn-close btn-close-white" (click)="closeDeleteModal()"></button>
         </div>
-
         <div class="modal-body text-center">
           <p>¿Eliminar a:</p>
-          <strong>
-            {{ studentToDelete.first_name }}
-            {{ studentToDelete.last_name }}
-          </strong>
+          <strong>{{ teacherToDelete.first_name }} {{ teacherToDelete.last_name }}</strong>
         </div>
-
         <div class="modal-footer justify-content-center">
-          <button class="btn btn-outline-secondary"
-                  (click)="closeDeleteModal()">
-            Cancelar
-          </button>
-
-          <button class="btn btn-danger"
-                  (click)="deleteConfirmed()">
-            Eliminar
-          </button>
+          <button class="btn btn-outline-secondary" (click)="closeDeleteModal()">Cancelar</button>
+          <button class="btn btn-danger" (click)="deleteConfirmed()">Eliminar</button>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- LOADING OVERLAY -->
+   <!-- LOADING OVERLAY -->
   <div *ngIf="loading"
        class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
        style="background:rgba(255,255,255,0.7);z-index:2000;">
@@ -304,6 +225,4 @@
     </div>
   </div>
 </div>
-
-
 </section>

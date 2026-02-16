@@ -1,39 +1,78 @@
 <section>
-    <div class="row">
-        <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
-            <div class="card mb-4 shadow-sm p-3">
-            <div class="card-header py-3" style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);border-radius: 13px 13px 0 0 !important;">
-                <h5 class="mb-0 text-white fw-bold d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-person-plus-fill me-2"></i>Create new group</span>
-                </h5>
-            </div>
-            <div class="card-body">
-                <form>
-                <div class="mb-3">
-                    <label for="groupName" class="form-label fw-bold">Group Name</label>
-                    <input type="text" class="form-control" id="groupName" placeholder="Enter group name">
-                </div>
-                <div class="">
-                    <label for="courseSelect" class="form-label fw-bold">Select Course</label>
-                    <select class="form-select" id="courseSelect">
-                    <option selected>Select a course</option>
-                    <option value="1">Web Development</option>
-                    <option value="2">Data Science</option>
-                    <option value="3">Digital Marketing</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="groupImage" class="form-label fw-bold mt-3">Group Image</label>
-                    <input type="file" class="form-control mt-3" id="groupImage" />
-                </div>
-                <div class="mb-3">
-                    <label for="groupDescription" class="form-label fw-bold">Group Description</label>
-                    <textarea class="form-control" id="groupDescription" rows="3" placeholder="Enter group description"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Group</button>
-                </form>
-            </div>
-            </div>
+  <div class="row">
+    <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
+      <div class="card mb-4 shadow-sm p-3">
+        <div class="card-header py-3" style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);border-radius: 13px 13px 0 0 !important;">
+          <h5 class="mb-0 text-white fw-bold">
+            <i class="bi bi-person-plus-fill me-2"></i>Create new group
+          </h5>
         </div>
+
+        <div class="card-body">
+          <form (ngSubmit)="submitGroup()" #groupForm="ngForm">
+
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Group Name</label>
+              <input type="text" class="form-control" name="name" [(ngModel)]="group.name" placeholder="Enter group name" required>
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Group Description</label>
+              <textarea class="form-control" name="description" [(ngModel)]="group.description" rows="3" placeholder="Enter group description"></textarea>
+            </div>
+
+            <!-- Fechas -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Start Date</label>
+              <input type="date" class="form-control" name="start_date" [(ngModel)]="group.start_date" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">End Date</label>
+              <input type="date" class="form-control" name="end_date" [(ngModel)]="group.end_date" required>
+            </div>
+
+            <!-- Capacidad -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Capacity</label>
+              <input type="number" class="form-control" name="capacity" [(ngModel)]="group.capacity" required>
+            </div>
+
+            <!-- Buscar y seleccionar profesor -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Assign Teacher</label>
+              <input type="text" class="form-control mb-2" placeholder="Search teacher..." [(ngModel)]="teacherFilter">
+              <select class="form-select" [(ngModel)]="group.teacherId" name="teacherId" required>
+                <option value="" disabled selected>Select a teacher</option>
+                <option *ngFor="let teacher of filteredTeachers()" [value]="teacher.id">
+                  {{ teacher.first_name }} {{ teacher.last_name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Buscar y seleccionar estudiantes -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Assign Students</label>
+              <input type="text" class="form-control mb-2" placeholder="Search students..." [(ngModel)]="studentFilter">
+              <select class="form-select" multiple [(ngModel)]="group.studentIds" name="studentIds">
+                <option *ngFor="let student of filteredStudents()" [value]="student.id">
+                  {{ student.first_name }} {{ student.last_name }}
+                </option>
+              </select>
+              <small class="text-muted">Hold Ctrl (or Cmd) to select multiple students.</small>
+            </div>
+
+            <!-- Mensajes -->
+            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+            <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+            <button type="submit" class="btn btn-primary" [disabled]="submitting">
+              {{ submitting ? 'Submitting...' : 'Add Group' }}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </section>

@@ -20,3 +20,31 @@
   cursor: pointer;
 }
 
+
+.profile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 1050;
+}
+
+.profile-container {
+  position: absolute;
+  top: 70px;
+  left: 20px;
+
+  width: 360px;        /* mismo tamaño que el card del perfil */
+  max-width: 90vw;
+
+  max-height: 80vh;
+  overflow-y: auto;
+
+  background: transparent; /* el card ya tiene fondo */
+  border-radius: 16px;
+}
+
+
+

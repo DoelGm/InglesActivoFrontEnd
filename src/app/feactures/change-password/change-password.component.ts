@@ -1,34 +1,49 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { 
+  FormBuilder, 
+  FormGroup, 
+  FormsModule, 
+  ReactiveFormsModule, 
+  Validators, 
+  AbstractControl, 
+  ValidationErrors 
+} from '@angular/forms';
 import { UsersService } from '../admin/services/users.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-change-password',
+  standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.css']
 })
 export class ChangePasswordComponent implements OnInit {
+
   passwordForm: FormGroup;
   alertMessage = '';
   userId!: number;
   alertType: 'success' | 'error' | '' = '';
+
+  showNewPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private fb: FormBuilder, 
     private userService: UsersService,
     private router: Router
   ) {
+
+    // 👇 Validador personalizado dentro del constructor
     this.passwordForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
-    });
+    }, { validators: this.passwordsMatchValidator });
+
   }
 
   ngOnInit() {
-    // Obtener userId del localStorage o del token
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
@@ -43,6 +58,22 @@ export class ChangePasswordComponent implements OnInit {
     }
   }
 
+  // 👇 Validador para comparar contraseñas
+  passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const newPassword = control.get('newPassword')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
+
+    return newPassword === confirmPassword ? null : { mismatch: true };
+  }
+
+  toggleNewPassword() {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPassword() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
   showAlert(message: string, type: 'success' | 'error') {
     this.alertMessage = message;
     this.alertType = type;
@@ -53,15 +84,9 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   onSubmit() {
+
     if (this.passwordForm.invalid) {
       this.showAlert('Completa todos los campos correctamente', 'error');
-      return;
-    }
-
-    const { newPassword, confirmPassword } = this.passwordForm.value;
-
-    if (newPassword !== confirmPassword) {
-      this.showAlert('Las contraseñas no coinciden', 'error');
       return;
     }
 
@@ -70,18 +95,16 @@ export class ChangePasswordComponent implements OnInit {
       return;
     }
 
-    // Crear objeto con los datos necesarios
     const changePasswordData = {
       userId: this.userId,
-      newPassword: newPassword
+      newPassword: this.passwordForm.value.newPassword
     };
 
     this.userService.changePassword(changePasswordData).subscribe({
-      next: (response) => {
+      next: () => {
         this.showAlert('Contraseña cambiada correctamente', 'success');
         this.passwordForm.reset();
-        
-        // Si el usuario debe cambiar la contraseña, redirigir al dashboard después de cambiarla
+
         setTimeout(() => {
           this.router.navigate(['/home']);
         }, 2000);

@@ -12,17 +12,19 @@ import { AddUsersComponent } from './feactures/admin/components/add-users/add-us
 import { AddNewsComponent } from './feactures/admin/components/add-news/add-news.component';
 import { TeachersComponent } from './feactures/admin/components/teachers/teachers.component';
 import { AdminsComponent } from './feactures/admin/components/admins/admins.component';
+import { authGuard } from './guards/auth.guard';
+import { ForgotPasswordPageComponent } from './feactures/forgot-password/pages/forgot-password/forgot-password-page.component';
+
 
 export const routes: Routes = [
-    {
-    path: '',
-    component: LoginPageComponent
-  },
+   { path: '', component: LoginPageComponent },
+   { path: 'forgotPassword', component: ForgotPasswordPageComponent },
 
   // PUBLIC LAYOUT
    {
     path: '',
     component: PublicComponent,
+    canActivate: [authGuard],
     children: [
       { path: 'home', component: HomePageComponent },
       { path: 'groups', component: GroupPageComponent },

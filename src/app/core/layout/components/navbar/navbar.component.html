@@ -1,29 +1,45 @@
 <section>
   <nav class="navbar custom-nav">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/home">
-        <img src="assets/imgs/logo-blanco.png" alt="Logo" width="200" height="50" class="d-inline-block align-text-top">
-      </a>
 
-<a href="/home" class="nav-link-custom">
-  <div class="d-inline-block text-white text-start">
-    <p class="mb-0 fs-5">Home</p>
-  </div>
-</a>
-
-
-      <div class="d-flex ms-auto">
-        <a class="icon-hover" href="#">
-          <img src="assets/imgs/notification.svg" alt="Logo" width="30" height="50" class="d-inline-block align-text-top me-3">
+      <!-- Iconos a la izquierda -->
+      <div class="d-flex align-items-center">
+        <!-- Icono de perfil -->
+        <a class="icon-hover text-white me-4 fs-1"
+           (click)="openProfile()">
+          <i class="bi bi-person-circle"></i>
         </a>
 
-        <a class="icon-hover" href="#">
-          <img src="assets/imgs/person-circle.svg" alt="Logo" width="70" height="50" class="d-inline-block align-text-top">
+        <!-- Icono de notificación -->
+        <a class="icon-hover text-white fs-3" href="#">
+          <i class="bi bi-bell"></i>
         </a>
       </div>
+
+      <!-- Home y logo al lado derecho -->
+      <div class="d-flex align-items-center ms-auto">
+        <a class="nav-link-custom me-4" (click)="goHome()">
+          <div class="d-inline-block text-white text-start">
+            <p class="mb-0 fs-5">Home</p>
+          </div>
+        </a>
+
+        <a class="navbar-brand" href="/home">
+          <img src="assets/imgs/logo-blanco.png"
+               alt="Logo"
+               width="200"
+               height="50"
+               class="d-inline-block align-text-top">
+        </a>
+      </div>
+
     </div>
   </nav>
 </section>
 
-
-
+<!-- Ventana emergente del perfil -->
+<div class="profile-overlay" *ngIf="showProfile" (click)="closeProfile()">
+  <div class="profile-container" (click)="$event.stopPropagation()">
+    <app-profile (close)="closeProfile()"></app-profile>
+  </div>
+</div>

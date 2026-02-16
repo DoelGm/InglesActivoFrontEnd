@@ -68,6 +68,13 @@ export class LoginFormComponent {
 
       localStorage.setItem('role', decoded.role);
 
+      // GUARDAR USUARIO
+      localStorage.setItem('user', JSON.stringify({
+        id: decoded.sub,   // o decoded.userId, depende de tu backend
+        email: decoded.email,
+        role: decoded.role
+      }));
+
      switch (decoded.role) {
       case 'admin':
         this.router.navigate(['/admin']);

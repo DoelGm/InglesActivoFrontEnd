@@ -39,7 +39,7 @@ export class UsersService {
   }
 
   changePassword(data: { userId: number; newPassword: string }) {
-  return this.http.post(`${this.apiUrl}/password-resets`, data);
+  return this.http.post(`${this.apiUrl}/users/change-password`, data);
 }
 
 

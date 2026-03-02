@@ -48,9 +48,9 @@ export class SidebarComponent implements OnInit {
       ];
     } else if (role === 'student') {
       this.links = [
-        { label: 'Groups', route: '/student/groups' },
-        { label: 'Grades', route: '/student/grades' },
-        { label: 'Attendance', route: '/student/grades'}
+        { label: 'Groups', route: '/groups' },
+        { label: 'Grades', route: '/grades' },
+        { label: 'Attendance', route: '/grades'}
       ];
     }
   }

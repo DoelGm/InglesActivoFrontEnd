@@ -12,6 +12,10 @@ export class LoginService {
 
   constructor(private http: HttpClient) {}
 
+  isLogged(): boolean {
+  return !!localStorage.getItem('token');
+}
+
   login(email: string, password: string) {
     const token = localStorage.getItem('token');
 

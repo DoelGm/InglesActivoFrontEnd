@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../../services/users.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ScrollAnimateDirective } from '../../../../shared/directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-teachers',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ScrollAnimateDirective],
   templateUrl: './teachers.component.html',
   styleUrls: ['./teachers.component.css']
 })
@@ -26,6 +27,9 @@ export class TeachersComponent implements OnInit {
   messageType: 'success' | 'danger' | '' = '';
 
   deleteMultiple = false;
+
+  searchTerm = '';
+private debounceTimer: any;
 
   constructor(private userService: UsersService) {}
 
@@ -55,6 +59,27 @@ export class TeachersComponent implements OnInit {
     );
   }
 
+  onSearchChange() {
+
+  clearTimeout(this.debounceTimer);
+
+  this.debounceTimer = setTimeout(() => {
+
+    const term = this.searchTerm.trim();
+
+    if (!term) {
+      this.getTeachers();
+      return;
+    }
+
+    this.userService.searchUsers(term).subscribe({
+      next: res => this.teachers = Array.isArray(res) ? res : [],
+      error: () => this.showMessage('Error en búsqueda', 'danger')
+    });
+
+  }, 400);
+}
+
   getInitials(name: string): string {
     if (!name) return '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
@@ -72,22 +97,33 @@ export class TeachersComponent implements OnInit {
   confirmDeleteMultiple() { if (this.selectedIds.length) this.deleteMultiple = true; }
   closeDeleteMultiple() { this.deleteMultiple = false; }
 
-  deleteSelected() {
-    if (!this.selectedIds.length) return;
-    this.loading = true;
-    const requests = this.selectedIds.map(id => this.userService.deleteUser(id).toPromise());
-    Promise.all(requests).then(() => {
-      this.teachers = this.teachers.filter(t => !this.selectedIds.includes(t.id));
-      this.selectedIds = [];
-      this.loading = false;
-      this.deleteMultiple = false;
-      this.showMessage('Profesores eliminados correctamente', 'success');
-    }).catch(() => {
-      this.loading = false;
-      this.deleteMultiple = false;
-      this.showMessage('Error eliminando algunos profesores', 'danger');
-    });
+  async deleteSelected() {
+
+  if (!this.selectedIds.length) return;
+
+  this.loading = true;
+
+  const results = await Promise.allSettled(
+    this.selectedIds.map(id =>
+      this.userService.deleteUserPromise(id)
+    )
+  );
+
+  const success = results.filter(r => r.status === 'fulfilled').length;
+  const failed = results.filter(r => r.status === 'rejected').length;
+
+  this.teachers = this.teachers.filter(t => !this.selectedIds.includes(t.id));
+
+  this.selectedIds = [];
+  this.loading = false;
+  this.deleteMultiple = false;
+
+  if (failed === 0) {
+    this.showMessage('Profesores eliminados correctamente', 'success');
+  } else {
+    this.showMessage(`${success} eliminados, ${failed} fallaron`, 'danger');
   }
+}
 
   editTeacher(teacher: any) { this.selectedTeacher = { ...teacher }; }
   closeModal() { this.selectedTeacher = null; }

@@ -6,12 +6,6 @@ import { FormsModule } from '@angular/forms';
 import {jwtDecode } from 'jwt-decode';
 import { environment } from '../../../../../enviroment/environment';
 
-interface TokenPayload {
-  role: string;
-  email: string;
-  exp: number;
-}
-
 
 @Component({
   selector: 'app-login-form',
@@ -70,10 +64,11 @@ export class LoginFormComponent {
 
       // GUARDAR USUARIO
       localStorage.setItem('user', JSON.stringify({
-        id: decoded.sub,   // o decoded.userId, depende de tu backend
+        id: decoded.profileId,   // o decoded.userId, depende de tu backend
         email: decoded.email,
         role: decoded.role
       }));
+      console.log('USER GUARDADO:', localStorage.getItem('user'));
 
      switch (decoded.role) {
       case 'admin':

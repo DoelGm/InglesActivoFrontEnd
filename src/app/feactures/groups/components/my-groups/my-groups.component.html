@@ -1,5 +1,6 @@
 <section class="mt-4">
-  <!-- Filtro por nombre -->
+
+  <!-- FILTRO -->
   <div class="row mb-4">
     <div class="col-md-6 mx-auto">
       <input
@@ -12,17 +13,36 @@
     </div>
   </div>
 
-  <!-- Grupos filtrados -->
+  <!-- BOTÓN ELIMINAR MÚLTIPLES (SOLO ADMIN) -->
+  <div class="text-center mb-3" *ngIf="isAdmin">
+    <button
+      class="btn btn-danger"
+      [disabled]="selectedGroups.length === 0"
+      (click)="openMultiDeleteModal()">
+      Eliminar seleccionados
+    </button>
+  </div>
+
+  <!-- LISTA DE GRUPOS -->
   <div class="row mt-3">
     <div
       class="col-md-6 mb-4"
-      *ngFor="let group of filteredGroups; let i = index"
-      (click)="goToGroup(group.id!)"
-    >
-      <div class="card shadow-sm h-100 cursor-pointer">
+      *ngFor="let group of filteredGroups; let i = index">
 
-        <!-- Logo circular más pequeño -->
-        <div 
+      <div
+        class="card shadow-sm h-100"
+        (click)="goToGroup(group.id!)">
+
+        <!-- Checkbox solo admin -->
+        <div class="text-end p-2" *ngIf="isAdmin">
+          <input
+            type="checkbox"
+            (click)="$event.stopPropagation()"
+            (change)="toggleSelection(group.id!, $event)">
+        </div>
+
+        <!-- Logo -->
+        <div
           class="mx-auto d-flex align-items-center justify-content-center mb-3 rounded-circle"
           [ngStyle]="{
             'background-color': colors[i],
@@ -31,20 +51,172 @@
             'font-size': '28px',
             'color': 'white',
             'margin-top': '15px'
-          }"
-        >
+          }">
           {{ getInitials(group.name) }}
         </div>
 
+        <!-- Nombre -->
         <div class="card-header text-center">
           <h5 class="mb-0">{{ group.name }}</h5>
         </div>
 
+        <!-- Descripción -->
         <div class="card-body text-center">
           <p>{{ group.description }}</p>
+        </div>
+
+        <!-- BOTONES ADMIN -->
+        <div class="text-center mb-3" *ngIf="isAdmin">
+
+          <button
+            class="btn btn-outline-primary btn-sm me-2"
+            (click)="openEditModal(group, $event)">
+            Editar
+          </button>
+
+          <button
+            class="btn btn-outline-danger btn-sm"
+            (click)="openDeleteModal(group, $event)">
+            Eliminar
+          </button>
+
         </div>
 
       </div>
     </div>
   </div>
+
 </section>
+
+<!-- ========================= -->
+<!-- MODAL EDITAR -->
+<!-- ========================= -->
+
+<div class="modal fade show"
+     *ngIf="groupToEdit"
+     style="display:block;background:rgba(0,0,0,0.5);">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-primary text-white rounded-top-4">
+        <h6 class="modal-title">Editar grupo</h6>
+        <button type="button"
+                class="btn-close btn-close-white"
+                (click)="closeEditModal()"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="mb-3">
+          <label class="form-label">Nombre</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="editData.name">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Descripción</label>
+          <textarea
+            class="form-control"
+            rows="3"
+            [(ngModel)]="editData.description">
+          </textarea>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary"
+                (click)="closeEditModal()">
+          Cancelar
+        </button>
+
+        <button class="btn btn-primary"
+                (click)="saveEdit()">
+          Guardar cambios
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- MODAL ELIMINAR INDIVIDUAL -->
+<!-- ========================= -->
+
+<div class="modal fade show"
+     *ngIf="groupToDelete"
+     style="display:block;background:rgba(0,0,0,0.5);">
+
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-danger text-white rounded-top-4">
+        <h6 class="modal-title">Confirmar eliminación</h6>
+        <button type="button"
+                class="btn-close btn-close-white"
+                (click)="closeDeleteModal()"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p>¿Eliminar el grupo:</p>
+        <strong>{{ groupToDelete.name }}</strong>
+      </div>
+
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-outline-secondary"
+                (click)="closeDeleteModal()">
+          Cancelar
+        </button>
+
+        <button class="btn btn-danger"
+                (click)="deleteConfirmed()">
+          Eliminar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========================= -->
+<!-- MODAL ELIMINAR MÚLTIPLE -->
+<!-- ========================= -->
+
+<div class="modal fade show"
+     *ngIf="showMultiDeleteModal"
+     style="display:block;background:rgba(0,0,0,0.5);">
+
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-danger text-white rounded-top-4">
+        <h6 class="modal-title">Eliminar múltiples grupos</h6>
+        <button type="button"
+                class="btn-close btn-close-white"
+                (click)="closeMultiDeleteModal()"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p>Se eliminarán:</p>
+        <strong>{{ selectedGroups.length }} grupos</strong>
+      </div>
+
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-outline-secondary"
+                (click)="closeMultiDeleteModal()">
+          Cancelar
+        </button>
+
+        <button class="btn btn-danger"
+                (click)="deleteMultipleConfirmed()">
+          Eliminar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -2,76 +2,179 @@
   <div class="row">
     <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
       <div class="card mb-4 shadow-sm p-3">
-        <div class="card-header py-3" style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);border-radius: 13px 13px 0 0 !important;">
+
+        <div class="card-header py-3"
+          style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);
+                 border-radius: 13px 13px 0 0 !important;">
           <h5 class="mb-0 text-white fw-bold">
-            <i class="bi bi-person-plus-fill me-2"></i>Create new group
+            <i class="bi bi-person-plus-fill me-2"></i>
+            Create New Group
           </h5>
         </div>
 
         <div class="card-body">
           <form (ngSubmit)="submitGroup()" #groupForm="ngForm">
 
-            <!-- Nombre -->
+            <!-- Group Name -->
             <div class="mb-3">
               <label class="form-label fw-bold">Group Name</label>
-              <input type="text" class="form-control" name="name" [(ngModel)]="group.name" placeholder="Enter group name" required>
+              <input
+                type="text"
+                class="form-control"
+                name="name"
+                [(ngModel)]="group.name"
+                required
+                placeholder="Enter group name">
             </div>
 
-            <!-- Descripción -->
+            <!-- Description -->
             <div class="mb-3">
               <label class="form-label fw-bold">Group Description</label>
-              <textarea class="form-control" name="description" [(ngModel)]="group.description" rows="3" placeholder="Enter group description"></textarea>
+              <textarea
+                class="form-control"
+                name="description"
+                [(ngModel)]="group.description"
+                rows="3"
+                placeholder="Enter group description">
+              </textarea>
             </div>
 
-            <!-- Fechas -->
+            <!-- Start Date -->
             <div class="mb-3">
               <label class="form-label fw-bold">Start Date</label>
-              <input type="date" class="form-control" name="start_date" [(ngModel)]="group.start_date" required>
+              <input
+                type="date"
+                class="form-control"
+                name="start_date"
+                [(ngModel)]="group.start_date"
+                required>
             </div>
+
+            <!-- End Date -->
             <div class="mb-3">
               <label class="form-label fw-bold">End Date</label>
-              <input type="date" class="form-control" name="end_date" [(ngModel)]="group.end_date" required>
+              <input
+                type="date"
+                class="form-control"
+                name="end_date"
+                [(ngModel)]="group.end_date"
+                required>
             </div>
 
-            <!-- Capacidad -->
+            <!-- Capacity -->
             <div class="mb-3">
               <label class="form-label fw-bold">Capacity</label>
-              <input type="number" class="form-control" name="capacity" [(ngModel)]="group.capacity" required>
+              <input
+                type="number"
+                class="form-control"
+                name="capacity"
+                [(ngModel)]="group.capacity"
+                min="1"
+                required>
             </div>
 
-            <!-- Buscar y seleccionar profesor -->
+            <!-- Assign Teacher with Search -->
             <div class="mb-3">
               <label class="form-label fw-bold">Assign Teacher</label>
-              <input type="text" class="form-control mb-2" placeholder="Search teacher..." [(ngModel)]="teacherFilter">
-              <select class="form-select" [(ngModel)]="group.teacherId" name="teacherId" required>
-                <option value="" disabled selected>Select a teacher</option>
-                <option *ngFor="let teacher of filteredTeachers()" [value]="teacher.id">
-                  {{ teacher.first_name }} {{ teacher.last_name }}
+              
+              <!-- Search input for teachers -->
+              <div class="mb-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search teacher by name..."
+                  [(ngModel)]="teacherSearch"
+                  [ngModelOptions]="{standalone: true}">
+                <small class="text-muted" *ngIf="filteredTeachers().length === 0">
+                  No teachers found matching "{{teacherSearch}}"
+                </small>
+              </div>
+
+              <!-- Teacher select with filtered options -->
+              <select
+                class="form-select"
+                name="teacher_id"
+                [(ngModel)]="group.teacher_id"
+                required>
+
+                <option [ngValue]="null" disabled selected>
+                  {{ filteredTeachers().length === 0 ? 'No teachers available' : 'Select a teacher' }}
+                </option>
+
+                <option
+                  *ngFor="let teacher of filteredTeachers()"
+                  [ngValue]="teacher.teacher_id">
+                  {{ teacher.displayName }}
                 </option>
               </select>
             </div>
 
-            <!-- Buscar y seleccionar estudiantes -->
+            <!-- Assign Students with Search -->
             <div class="mb-3">
               <label class="form-label fw-bold">Assign Students</label>
-              <input type="text" class="form-control mb-2" placeholder="Search students..." [(ngModel)]="studentFilter">
-              <select class="form-select" multiple [(ngModel)]="group.studentIds" name="studentIds">
-                <option *ngFor="let student of filteredStudents()" [value]="student.id">
-                  {{ student.first_name }} {{ student.last_name }}
+              
+              <!-- Search input for students -->
+              <div class="mb-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search students by name..."
+                  [(ngModel)]="studentSearch"
+                  [ngModelOptions]="{standalone: true}">
+                <small class="text-muted" *ngIf="filteredStudents().length === 0">
+                  No students found matching "{{studentSearch}}"
+                </small>
+              </div>
+
+              <!-- Students multi-select with filtered options -->
+              <select
+                class="form-select"
+                multiple
+                name="student_ids"
+                [(ngModel)]="group.student_ids"
+                [size]="Math.min(filteredStudents().length, 6)"
+                style="min-height: 120px;">
+
+                <option
+                  *ngFor="let student of filteredStudents()"
+                  [ngValue]="student.student_id"
+                  [style.background]="isSelected(student.student_id) ? '#e3f2fd' : ''">
+                  {{ student.displayName }}
                 </option>
               </select>
-              <small class="text-muted">Hold Ctrl (or Cmd) to select multiple students.</small>
+
+              <div class="d-flex justify-content-between mt-2">
+                <small class="text-muted">
+                  Selected: {{ group.student_ids.length }} students
+                </small>
+                <small class="text-muted">
+                  Hold Ctrl (or Cmd) to select multiple
+                </small>
+              </div>
             </div>
 
-            <!-- Mensajes -->
-            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-            <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
 
-            <button type="submit" class="btn btn-primary" [disabled]="submitting">
+            <!-- Success Message -->
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="submitting || groupForm.invalid">
+
               {{ submitting ? 'Submitting...' : 'Add Group' }}
             </button>
+
           </form>
         </div>
+
       </div>
     </div>
   </div>

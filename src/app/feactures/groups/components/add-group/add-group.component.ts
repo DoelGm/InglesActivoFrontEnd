@@ -1,8 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GroupService } from '../../service/group.service';
+import { forkJoin } from 'rxjs';
+
+import { GroupService } from '../../service/groups/group.service';
 import { UsersService } from '../../../admin/services/users.service';
+import { TeacherAssignmentService } from '../../service/teachers-assignment/teacher-assignment.service';
+import { EnrollmentService } from '../../service/enrollment/enrollment.service';
+
+interface GroupForm {
+  name: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  capacity: number | null;
+  teacher_id: number | null;
+  student_ids: number[];
+}
 
 @Component({
   selector: 'app-add-group',
@@ -12,86 +26,113 @@ import { UsersService } from '../../../admin/services/users.service';
   styleUrls: ['./add-group.component.css']
 })
 export class AddGroupComponent implements OnInit {
-  group: any = {
+
+  group: GroupForm = {
     name: '',
     description: '',
     start_date: '',
     end_date: '',
-    capacity: 0,
-    teacherId: null,
-    studentIds: [] as number[]
+    capacity: null,
+    teacher_id: null,
+    student_ids: []
   };
-
+  
+  teacherSearch = '';
+  studentSearch = '';
   teachers: any[] = [];
   students: any[] = [];
-
-  teacherFilter: string = '';
-  studentFilter: string = '';
 
   submitting = false;
   errorMessage = '';
   successMessage = '';
 
-  loadingTeachers = false;
-  loadingStudents = false;
+  // Para usar Math en el template
+  Math = Math;
 
   constructor(
     private groupService: GroupService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private teacherAssignmentService: TeacherAssignmentService,
+    private enrollmentService: EnrollmentService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadTeachers();
     this.loadStudents();
   }
 
-  loadTeachers() {
-    this.loadingTeachers = true;
-    this.usersService.viewTeachers().subscribe({
-      next: (res) => {
-        this.teachers = Array.isArray(res) ? res : [];
-        this.loadingTeachers = false;
+  loadTeachers(): void {
+    this.usersService.getAllTeachers().subscribe({
+      next: (teachers) => { 
+        const teachersArray = Array.isArray(teachers)
+          ? teachers
+          : [teachers];
+
+        this.teachers = teachersArray.map((teacher: any) => ({
+          teacher_id: teacher.id,
+          displayName: `${teacher.user.first_name} ${teacher.user.last_name}`
+        }));
       },
       error: (err) => {
-        console.error('Error loading teachers', err);
+        console.error(err);
         this.teachers = [];
-        this.loadingTeachers = false;
       }
     });
   }
 
-  loadStudents() {
-    this.loadingStudents = true;
-    this.usersService.viewStudents().subscribe({
-      next: (res) => {
-        this.students = Array.isArray(res) ? res : [];
-        this.loadingStudents = false;
+  loadStudents(): void {
+    this.usersService.getAllStudents().subscribe({
+      next: (students) => {
+        const studentsArray = Array.isArray(students)
+          ? students
+          : [students];
+
+        this.students = studentsArray.map((student: any) => ({
+          student_id: student.id,
+          displayName: `${student.user.first_name} ${student.user.last_name}`
+        }));
       },
       error: (err) => {
-        console.error('Error loading students', err);
+        console.error(err);
         this.students = [];
-        this.loadingStudents = false;
       }
     });
   }
 
   filteredTeachers() {
-    if (!this.teacherFilter) return this.teachers;
+    if (!this.teacherSearch.trim()) {
+      return this.teachers;
+    }
+    const searchTerm = this.teacherSearch.toLowerCase().trim();
     return this.teachers.filter(t =>
-      (t.first_name + ' ' + t.last_name).toLowerCase().includes(this.teacherFilter.toLowerCase())
+      t.displayName.toLowerCase().includes(searchTerm)
     );
   }
 
   filteredStudents() {
-    if (!this.studentFilter) return this.students;
+    if (!this.studentSearch.trim()) {
+      return this.students;
+    }
+    const searchTerm = this.studentSearch.toLowerCase().trim();
     return this.students.filter(s =>
-      (s.first_name + ' ' + s.last_name).toLowerCase().includes(this.studentFilter.toLowerCase())
+      s.displayName.toLowerCase().includes(searchTerm)
     );
   }
 
-  submitGroup() {
-    if (!this.group.name || !this.group.start_date || !this.group.end_date || !this.group.capacity || !this.group.teacherId) {
-      this.errorMessage = 'Please fill all required fields.';
+  isSelected(studentId: number): boolean {
+    return this.group.student_ids.includes(studentId);
+  }
+
+  submitGroup(): void {
+    if (
+      !this.group.name ||
+      !this.group.start_date ||
+      !this.group.end_date ||
+      this.group.capacity === null ||
+      this.group.capacity <= 0 ||
+      this.group.teacher_id === null
+    ) {
+      this.errorMessage = 'Please fill all required fields correctly.';
       return;
     }
 
@@ -100,41 +141,76 @@ export class AddGroupComponent implements OnInit {
     this.successMessage = '';
 
     const payload = {
-      ...this.group,
+      name: this.group.name,
+      description: this.group.description,
+      start_date: this.group.start_date,
+      end_date: this.group.end_date,
+      capacity: this.group.capacity,
       code: this.generateCode(),
       is_active: true
     };
 
     this.groupService.createGroup(payload).subscribe({
-      next: (res) => {
-        this.successMessage = 'Group created successfully!';
-        console.log('Created group:', res);
-        this.resetForm();
-        this.submitting = false;
+      next: (createdGroup) => {
+        const groupId = createdGroup?.id;
+        if (!groupId) {
+          this.errorMessage = 'Invalid group response.';
+          this.submitting = false;
+          return;
+        }
+
+        const teacherRequest =
+          this.teacherAssignmentService.assignTeacher(
+            groupId,
+            this.group.teacher_id!
+          );
+
+        const enrollmentRequests = this.group.student_ids.map(
+          studentId =>
+            this.enrollmentService.enrollStudent(groupId, studentId)
+        );
+
+        forkJoin([teacherRequest, ...enrollmentRequests]).subscribe({
+          next: () => {
+            this.successMessage = 'Group created successfully!';
+            this.resetForm();
+            this.submitting = false;
+          },
+          error: (err) => {
+            console.error(err);
+            this.errorMessage =
+              'Error assigning teacher or enrolling students.';
+            this.submitting = false;
+          }
+        });
       },
       error: (err) => {
-        console.error('Error creating group:', err);
-        this.errorMessage = err?.error?.message || 'Error creating group. Check console.';
+        console.error(err);
+        this.errorMessage =
+          err?.error?.message || 'Error creating group.';
         this.submitting = false;
       }
     });
   }
 
   generateCode(): string {
-    return 'GRP-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+    return (
+      'GRP-' +
+      Math.random().toString(36).substring(2, 7).toUpperCase()
+    );
   }
 
-  resetForm() {
+  resetForm(): void {
     this.group = {
       name: '',
       description: '',
       start_date: '',
       end_date: '',
-      capacity: 0,
-      teacherId: null,
-      studentIds: []
+      capacity: null,
+      teacher_id: null,
+      student_ids: []
     };
-    this.teacherFilter = '';
-    this.studentFilter = '';
+    this.teacherSearch = '';
+    this.studentSearch = '';
   }
 }

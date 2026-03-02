@@ -18,7 +18,8 @@
       </div>
 
       <div class="card-body">
-        <!-- Filters -->
+
+         <!-- Filters -->
         <div class="row mb-3">
           <div class="col-md-6">
             <input type="text"
@@ -44,6 +45,7 @@
           <button type="button" class="btn-close float-end" (click)="message=''"></button>
         </div>
 
+        <div class="card p-3 mb-3" appScrollAnimate>
         <!-- Table -->
         <div class="table-responsive">
           <table class="table table-hover align-middle">
@@ -177,17 +179,6 @@
     </div>
   </div>
 
-   <!-- LOADING OVERLAY -->
-  <div *ngIf="loading"
-       class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-       style="background:rgba(255,255,255,0.7);z-index:2000;">
-
-    <div class="text-center">
-      <div class="spinner-border text-primary"
-           style="width:3rem;height:3rem;"></div>
-      <p class="mt-3 fw-semibold">Cargando...</p>
-    </div>
-  </div>
 
   <div class="modal fade show"
      *ngIf="deleteMultiple"
@@ -224,5 +215,6 @@
 
     </div>
   </div>
+</div>
 </div>
 </section>

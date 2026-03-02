@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../enviroment/environment';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsersService {
 
+  private cache = new Map<string, any>();
   private apiUrl = `${environment.apiUrl}`;
 
   constructor(private http: HttpClient) {}
@@ -17,21 +19,19 @@ export class UsersService {
     return { Authorization: `Bearer ${token}` };
   }
 
-  // Para crear profesor (crea usuario + perfil teacher)
+
   createTeacher(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/users/create-teacher`, data, {
       headers: this.getAuthHeaders()
     });
   }
 
-  // Para crear estudiante (crea usuario + perfil student)
   createStudent(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/users/create-student`, data, {
       headers: this.getAuthHeaders()
     });
   }
 
-  // Para crear admin (solo usuario con rol admin)
   createAdmin(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/users/create-admin`, data, {
       headers: this.getAuthHeaders()
@@ -39,45 +39,88 @@ export class UsersService {
   }
 
   changePassword(data: { userId: number; newPassword: string }) {
-  return this.http.post(`${this.apiUrl}/users/change-password`, data);
-}
-
-
-  // Métodos de consulta
-  getUserById(id: number) {
-    return this.http.get(`${this.apiUrl}/users/${id}`);
+    return this.http.post(`${this.apiUrl}/users/change-password`, data);
   }
 
+  private cachedRequest(key: string, request: Observable<any>) {
+    if (this.cache.has(key)) {
+      return of(this.cache.get(key));
+    }
+
+    return request.pipe(
+      tap(data => this.cache.set(key, data))
+    );
+  }
+
+
   viewStudents(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/students`, {
+    return this.cachedRequest(
+      'students',
+      this.http.get(`${this.apiUrl}/users/students`, { headers: this.getAuthHeaders() })
+    );
+  }
+
+  getAllStudents(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/students_profile`, { headers: this.getAuthHeaders() });
+  }
+
+  viewTeachers(): Observable<any> {
+    return this.cachedRequest(
+      'teachers',
+      this.http.get(`${this.apiUrl}/users/teachers`, { headers: this.getAuthHeaders() })
+    );
+  }
+
+  getAllTeachers(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/teachers`, { headers: this.getAuthHeaders() });
+  }
+
+  viewAdmins(): Observable<any> {
+    return this.cachedRequest(
+      'admins',
+      this.http.get(`${this.apiUrl}/users/admins`, { headers: this.getAuthHeaders() })
+    );
+  }
+
+  getUserById(id: number) {
+    return this.cachedRequest(
+      `user-${id}`,
+      this.http.get(`${this.apiUrl}/users/${id}`, { headers: this.getAuthHeaders() })
+    );
+  }
+
+
+  searchUsers(term: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users/search?q=${term}`, {
       headers: this.getAuthHeaders()
     });
   }
 
 
+
   updateUser(id: number, data: any): Observable<any> {
+    this.clearUserCache(id);
     return this.http.put(`${this.apiUrl}/users/${id}`, data, {
       headers: this.getAuthHeaders()
     });
   }
 
-
   deleteUser(id: number): Observable<any> {
+    this.clearUserCache(id);
     return this.http.delete(`${this.apiUrl}/users/${id}`, {
       headers: this.getAuthHeaders()
     });
   }
 
-
-  viewTeachers(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/teachers`, {
-      headers: this.getAuthHeaders()
-    });
+  private clearUserCache(id: number) {
+    this.cache.delete(`user-${id}`);
+    this.cache.delete('teachers');
+    this.cache.delete('students');
+    this.cache.delete('admins');
   }
 
-  viewAdmins(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/admins`, {
-      headers: this.getAuthHeaders()
-    });   
+
+  deleteUserPromise(id: number) {
+    return firstValueFrom(this.deleteUser(id));
   }
 }

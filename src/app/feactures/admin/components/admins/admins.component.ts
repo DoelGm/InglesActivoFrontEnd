@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../../services/users.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ScrollAnimateDirective } from '../../../../shared/directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-admins',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ScrollAnimateDirective],
   templateUrl: './admins.component.html',
   styleUrls: ['./admins.component.css']
 })
@@ -26,6 +27,9 @@ export class AdminsComponent implements OnInit {
   messageType: 'success' | 'danger' | '' = '';
 
   deleteMultiple = false;
+
+  searchTerm = '';
+private debounceTimer: any;
 
   constructor(private userService: UsersService) {}
 
@@ -55,6 +59,27 @@ export class AdminsComponent implements OnInit {
     );
   }
 
+  onSearchChange() {
+
+  clearTimeout(this.debounceTimer);
+
+  this.debounceTimer = setTimeout(() => {
+
+    const term = this.searchTerm.trim();
+
+    if (!term) {
+      this.getAdmins();
+      return;
+    }
+
+    this.userService.searchUsers(term).subscribe({
+      next: res => this.admins = Array.isArray(res) ? res : [],
+      error: () => this.showMessage('Error en búsqueda', 'danger')
+    });
+
+  }, 400);
+}
+
   getInitials(name: string): string {
     if (!name) return '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
@@ -72,22 +97,33 @@ export class AdminsComponent implements OnInit {
   confirmDeleteMultiple() { if (this.selectedIds.length) this.deleteMultiple = true; }
   closeDeleteMultiple() { this.deleteMultiple = false; }
 
-  deleteSelected() {
-    if (!this.selectedIds.length) return;
-    this.loading = true;
-    const requests = this.selectedIds.map(id => this.userService.deleteUser(id).toPromise());
-    Promise.all(requests).then(() => {
-      this.admins = this.admins.filter(a => !this.selectedIds.includes(a.id));
-      this.selectedIds = [];
-      this.loading = false;
-      this.deleteMultiple = false;
-      this.showMessage('Administradores eliminados correctamente', 'success');
-    }).catch(() => {
-      this.loading = false;
-      this.deleteMultiple = false;
-      this.showMessage('Error eliminando algunos administradores', 'danger');
-    });
+  async deleteSelected() {
+
+  if (!this.selectedIds.length) return;
+
+  this.loading = true;
+
+  const results = await Promise.allSettled(
+    this.selectedIds.map(id =>
+      this.userService.deleteUserPromise(id)
+    )
+  );
+
+  const success = results.filter(r => r.status === 'fulfilled').length;
+  const failed = results.filter(r => r.status === 'rejected').length;
+
+  this.admins = this.admins.filter(a => !this.selectedIds.includes(a.id));
+
+  this.selectedIds = [];
+  this.loading = false;
+  this.deleteMultiple = false;
+
+  if (failed === 0) {
+    this.showMessage('Administradores eliminados correctamente', 'success');
+  } else {
+    this.showMessage(`${success} eliminados, ${failed} fallaron`, 'danger');
   }
+}
 
   editAdmin(admin: any) { this.selectedAdmin = { ...admin }; }
   closeModal() { this.selectedAdmin = null; }

@@ -1,5 +1,7 @@
-<section>
-  <div class="position-fixed end-0 top-50 translate-middle-y me-3">
+<section *ngIf="showMenu">
+   <div class="position-fixed end-0 top-50 translate-middle-y me-3">
+
+    <div class="card border-info rounded-4 shadow-sm" style="width: 18rem;" appScrollAnimate>
     <div class="card border-info rounded-4 shadow-sm" style="width: 18rem;">
       
       <div class="card-header bg-info text-white rounded-top-4 py-3">
@@ -12,7 +14,7 @@
       <div class="card-body bg-light p-3">
         <div class="list-group list-group-flush">
 
-          <a href="/admin/addUsers"
+          <a routerLink="/admin/addUsers"
              class="list-group-item list-group-item-action d-flex align-items-center gap-3 rounded-3 mb-2 border">
             <span class="bg-info bg-opacity-25 p-2 rounded-circle">
               <i class="bi bi-person-plus-fill text-info fs-5"></i>
@@ -24,7 +26,7 @@
             <i class="bi bi-chevron-right ms-auto text-info"></i>
           </a>
 
-          <a href="/admin/students"
+          <a routerLink="/admin/students"
              class="list-group-item list-group-item-action d-flex align-items-center gap-3 rounded-3 mb-2 border">
             <span class="bg-success bg-opacity-25 p-2 rounded-circle">
               <i class="bi bi-people-fill text-success fs-5"></i>
@@ -36,7 +38,7 @@
             <i class="bi bi-chevron-right ms-auto text-success"></i>
           </a>
 
-          <a href="/admin/teachers"
+          <a routerLink="/admin/teachers"
              class="list-group-item list-group-item-action d-flex align-items-center gap-3 rounded-3 mb-2 border">
             <span class="bg-dark bg-opacity-25 p-2 rounded-circle">
               <i class="bi bi-people-fill text-dark fs-5"></i>
@@ -48,7 +50,7 @@
             <i class="bi bi-chevron-right ms-auto text-success"></i>
           </a>
 
-          <a href="/admin/admins"
+          <a routerLink="/admin/admins"
              class="list-group-item list-group-item-action d-flex align-items-center gap-3 rounded-3 mb-2 border">
             <span class="bg- bg-opacity-25 p-2 rounded-circle">
               <i class="bi bi-people-fill text-dark fs-5"></i>
@@ -60,7 +62,7 @@
             <i class="bi bi-chevron-right ms-auto text-success"></i>
           </a>
 
-          <a href="/admin/addGroup"
+          <a routerLink="/admin/addGroup"
              class="list-group-item list-group-item-action d-flex align-items-center gap-3 rounded-3 mb-2 border">
             <span class="bg-warning bg-opacity-25 p-2 rounded-circle">
               <i class="bi bi-plus-circle-fill text-warning fs-5"></i>
@@ -72,7 +74,7 @@
             <i class="bi bi-chevron-right ms-auto text-warning"></i>
           </a>
 
-          <a href="/admin/addNews"
+          <a routerLink="/admin/addNews"
           class="list-group-item list-group-item-action d-flex align-items-center gap-3 rounded-3 border">
             <span class="bg-danger bg-opacity-25 p-2 rounded-circle">
               <i class="bi bi-megaphone ms-auto text-danger fs-5"></i>
@@ -88,5 +90,6 @@
       </div>
 
     </div>
+  </div>
   </div>
 </section>

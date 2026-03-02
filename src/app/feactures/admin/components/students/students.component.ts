@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../../services/users.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ScrollAnimateDirective } from '../../../../shared/directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-students',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ScrollAnimateDirective],
   templateUrl: './students.component.html',
   styleUrl: './students.component.css'
 })
@@ -25,6 +26,9 @@ export class StudentsComponent implements OnInit {
 
   message: string = '';
   messageType: 'success' | 'danger' | '' = '';
+
+  searchTerm = '';
+private debounceTimer: any;
 
   constructor(private studentService: UsersService) {}
 
@@ -78,6 +82,27 @@ export class StudentsComponent implements OnInit {
     );
   }
 
+  onSearchChange() {
+
+  clearTimeout(this.debounceTimer);
+
+  this.debounceTimer = setTimeout(() => {
+
+    const term = this.searchTerm.trim();
+
+    if (!term) {
+      this.getStudents();
+      return;
+    }
+
+    this.studentService.searchUsers(term).subscribe({
+      next: res => this.students = Array.isArray(res) ? res : [],
+      error: () => this.showMessage('Error en búsqueda', 'danger')
+    });
+
+  }, 400);
+}
+
   getInitials(name: string): string {
     if (!name) return '';
     return name.split(' ')
@@ -107,35 +132,32 @@ export class StudentsComponent implements OnInit {
     }
   }
 
-  deleteSelected(): void {
-  if (this.selectedIds.length === 0) return;
+  async deleteSelected() {
+
+  if (!this.selectedIds.length) return;
 
   this.loading = true;
 
-  const requests = this.selectedIds.map(id =>
-    this.studentService.deleteUser(id).toPromise()
+  const results = await Promise.allSettled(
+    this.selectedIds.map(id =>
+      this.studentService.deleteUserPromise(id)
+    )
   );
 
-  Promise.all(requests)
-    .then(() => {
-      this.students = this.students.filter(
-        s => !this.selectedIds.includes(s.id)
-      );
+  const success = results.filter(r => r.status === 'fulfilled').length;
+  const failed = results.filter(r => r.status === 'rejected').length;
 
-      this.selectedIds = [];
-      this.loading = false;
-      this.deleteMultiple = false;
+  this.students = this.students.filter(s => !this.selectedIds.includes(s.id));
 
-      this.message = 'Estudiantes eliminados correctamente';
-      this.messageType = 'success';
-    })
-    .catch(() => {
-      this.loading = false;
-      this.deleteMultiple = false;
+  this.selectedIds = [];
+  this.loading = false;
+  this.deleteMultiple = false;
 
-      this.message = 'Error eliminando algunos estudiantes';
-      this.messageType = 'danger';
-    });
+  if (failed === 0) {
+    this.showMessage('Estudiantes eliminados correctamente', 'success');
+  } else {
+    this.showMessage(`${success} eliminados, ${failed} fallaron`, 'danger');
+  }
 }
 
 

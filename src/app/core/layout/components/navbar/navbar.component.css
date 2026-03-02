@@ -1,26 +1,52 @@
-.icon-hover img {
-  transition: transform 0.2s ease;
-}
-
-.icon-hover:hover img {
-  transform: scale(1.1);
-  cursor: pointer;
-}
-
+/* ===== NAVBAR ===== */
 .custom-nav {
   background-color: #00BBFF !important;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.15);
+  padding: 10px 0;
 }
 
+/* ===== ICONOS ===== */
+.icon-hover {
+  cursor: pointer;
+  transition: transform .25s ease, opacity .25s ease, text-shadow .25s ease;
+}
+
+.icon-hover:hover {
+  transform: translateY(-2px) scale(1.12);
+  opacity: .9;
+  text-shadow: 0 4px 12px rgba(255,255,255,.4);
+}
+
+.icon-hover:active {
+  transform: scale(.95);
+}
+
+/* ===== LINK HOME ===== */
 .nav-link-custom {
-  transition: transform 0.2s ease;
+  position: relative;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 10px;
+  transition: transform .2s ease, background .25s ease;
 }
 
 .nav-link-custom:hover {
-  transform: scale(1.1);
-  cursor: pointer;
+  transform: translateY(-2px);
+  background: rgba(255,255,255,.15);
 }
 
+/* ===== LOGO ===== */
+.navbar-brand img {
+  transition: transform .35s ease, filter .35s ease;
+}
 
+.navbar-brand:hover img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.25));
+}
+
+/* ===== PERFIL POPUP ===== */
 .profile-overlay {
   position: fixed;
   top: 0;
@@ -35,16 +61,43 @@
   position: absolute;
   top: 70px;
   left: 20px;
-
-  width: 360px;        /* mismo tamaño que el card del perfil */
+  width: 360px;
   max-width: 90vw;
-
   max-height: 80vh;
   overflow-y: auto;
-
-  background: transparent; /* el card ya tiene fondo */
   border-radius: 16px;
 }
 
+/* ===== SCROLL BONITO (detalle pro que el profe nota) ===== */
+.profile-container::-webkit-scrollbar {
+  width: 6px;
+}
 
+.profile-container::-webkit-scrollbar-thumb {
+  background: #00BBFF;
+  border-radius: 10px;
+}
 
+.toast-notification {
+  background: #ffffff6e;
+  color: rgb(0, 0, 0);
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  font-weight: 500;
+  text-align: center;
+  font-size: 0.85rem;
+  width: 300px;
+}
+
+/* Animación de entrada */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Animación de salida */
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

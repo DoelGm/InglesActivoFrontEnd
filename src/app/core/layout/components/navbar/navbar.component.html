@@ -3,17 +3,32 @@
     <div class="container-fluid">
 
       <!-- Iconos a la izquierda -->
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center position-relative">
+
         <!-- Icono de perfil -->
-        <a class="icon-hover text-white me-4 fs-1"
-           (click)="openProfile()">
+        <a class="icon-hover text-white me-4 fs-1" (click)="openProfile()">
           <i class="bi bi-person-circle"></i>
         </a>
 
         <!-- Icono de notificación -->
-        <a class="icon-hover text-white fs-3" href="#">
+        <a class="icon-hover text-white fs-3 position-relative"
+           (click)="toggleNotifications()">
           <i class="bi bi-bell"></i>
+
+          <!-- Contador de notificaciones -->
+          <span *ngIf="notificationCount > 0" 
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ notificationCount }}
+          </span>
+
+          <!-- Contenido de la notificación (solo al click) -->
+          <div class="toast-notification position-absolute"
+               *ngIf="showNotifications"
+               style="top: 30px; left: 50%; transform: translateX(-50%); z-index: 2000;">
+            {{ lastNotification }}
+          </div>
         </a>
+
       </div>
 
       <!-- Home y logo al lado derecho -->
@@ -25,11 +40,7 @@
         </a>
 
         <a class="navbar-brand" href="/home">
-          <img src="assets/imgs/logo-blanco.png"
-               alt="Logo"
-               width="200"
-               height="50"
-               class="d-inline-block align-text-top">
+          <img src="assets/imgs/logo-blanco.png" alt="Logo" width="200" height="50" class="d-inline-block align-text-top">
         </a>
       </div>
 

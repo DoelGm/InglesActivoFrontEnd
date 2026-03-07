@@ -19,7 +19,7 @@ export class GroupDetailComponent implements OnInit {
 
   students:any[] = [];
   availableStudents:any[] = [];
-
+  isAdmin = false;
   selectedStudents:number[] = [];
   studentsToAdd:number[] = [];
 
@@ -40,16 +40,28 @@ export class GroupDetailComponent implements OnInit {
 
   ngOnInit(){
 
-    this.groupId = Number(this.route.snapshot.paramMap.get('id'));
+  const role = localStorage.getItem('role');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user.id;
 
+  this.groupId = Number(this.route.snapshot.paramMap.get('id'));
+
+  this.isAdmin = role === 'admin'|| role === 'teacher';
+
+  if (role === 'admin'|| role === 'teacher') {
     this.loadGroupStudents();
     this.loadStudents();
-
-    this.posts=[
-      {title:'Bienvenidos',content:'Primera publicación'},
-      {title:'Aviso',content:'Clase mañana'}
-    ];
+  } else if (role === 'student') {
+    this.loadGroupStudents();
   }
+
+  this.posts=[
+    {title:'Bienvenidos',content:'Primera publicación'},
+    {title:'Aviso',content:'Clase mañana'}
+  ];
+
+  }
+
 
   loadGroupStudents(){
 

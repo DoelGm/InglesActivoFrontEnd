@@ -57,9 +57,6 @@ export class MyGroupsComponent implements OnInit {
     }
   }
 
-  // =====================
-  // 📚 CARGAS POR ROL
-  // =====================
 
   loadAllGroups() {
     this.groupService.getAllGroups().subscribe({

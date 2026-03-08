@@ -1,1 +1,215 @@
-<p>my-grades works!</p>
+<section>
+<div class="container mt-4">
+
+<div *ngIf="message"
+     class="alert mt-3"
+     [ngClass]="{
+       'alert-success': messageType === 'success',
+       'alert-danger': messageType === 'danger'
+     }">
+  {{ message }}
+</div>
+
+<div *ngIf="loading" class="text-center my-5">
+  <div class="spinner-border text-primary"></div>
+</div>
+
+<!-- SELECT GROUP -->
+<div *ngIf="userRole !== 'student'" class="card shadow-sm mb-4">
+
+  <div class="card-header text-white"
+       style="background: linear-gradient(135deg,#003143 0%,#5fb3f7 100%);">
+
+    <h5 class="mb-0">
+      <i class="bi bi-people-fill me-2"></i>
+      Select Group
+    </h5>
+
+  </div>
+
+  <div class="card-body">
+
+    <label class="form-label fw-semibold">Group</label>
+
+    <select class="form-select"
+            [(ngModel)]="selectedGroupId"
+            (change)="loadStudentsByGroup()">
+
+      <option value="">Select group</option>
+
+      <option *ngFor="let g of groups"
+              [value]="g.id">
+        {{ g.name }}
+      </option>
+
+    </select>
+
+  </div>
+
+</div>
+
+
+<!-- TEACHER TABLE -->
+<div *ngIf="studentsInGroup.length > 0"
+     class="card shadow-sm">
+
+  <div class="card-header text-white"
+       style="background: linear-gradient(135deg,#003143 0%,#5fb3f7 100%);">
+
+    <h5 class="mb-0">
+      <i class="bi bi-journal-check me-2"></i>
+      Students Grades
+    </h5>
+
+  </div>
+
+  <div class="card-body">
+
+    <div class="table-responsive">
+
+      <table class="table table-hover align-middle">
+
+        <thead class="table-light">
+          <tr>
+            <th>Student</th>
+            <th width="150">Grade</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let s of studentsInGroup">
+
+            <td>
+              <div class="d-flex align-items-center">
+
+                <div class="rounded-circle text-white d-flex justify-content-center align-items-center"
+                     style="width:36px;height:36px;
+                     background: linear-gradient(135deg,#17a2b8,#0d6efd);">
+
+                  {{ s.studentName.charAt(0) }}
+
+                </div>
+
+                <div class="ms-3 fw-semibold">
+                  {{ s.studentName }}
+                </div>
+
+              </div>
+            </td>
+
+            <td>
+
+              <input type="number"
+                     class="form-control border-primary"
+                     min="0"
+                     max="10"
+                     [(ngModel)]="s.score">
+
+            </td>
+
+            <td>
+
+              <input type="text"
+                     class="form-control"
+                     [(ngModel)]="s.comments">
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div class="text-end mt-3">
+
+      <button
+      class="btn btn-success"
+      (click)="saveAllGrades()">
+
+      Save Grades
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- STUDENT VIEW -->
+
+<div *ngIf="userRole === 'student'"
+     class="card shadow-sm">
+
+  <div class="card-header text-white"
+       style="background: linear-gradient(135deg,#003143 0%,#5fb3f7 100%);">
+
+    <h5 class="mb-0">
+      <i class="bi bi-clipboard-data me-2"></i>
+      My Grades
+    </h5>
+
+  </div>
+
+  <div class="card-body">
+
+    <div class="table-responsive">
+
+      <table class="table table-hover align-middle">
+
+        <thead class="table-light">
+
+          <tr>
+            <th>Group</th>
+            <th>Grade</th>
+            <th>Comment</th>
+            <th>Date</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let g of grades">
+
+            <td>{{ g.groupName }}</td>
+
+            <td>
+
+              <span class="badge fs-6 px-3 py-2"
+              [ngClass]="{
+              'bg-success': g.grade >= 7,
+              'bg-warning text-dark': g.grade >=5 && g.grade <7,
+              'bg-danger': g.grade <5
+              }">
+
+              {{ g.grade }}
+
+              </span>
+
+            </td>
+
+            <td>{{ g.comment }}</td>
+
+            <td>{{ g.createdAt | date:'short' }}</td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+</section>

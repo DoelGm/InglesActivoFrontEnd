@@ -119,6 +119,20 @@ export class AddGroupComponent implements OnInit {
     );
   }
 
+  isStudentSelected(id: number): boolean {
+  return this.group.student_ids.includes(id);
+}
+
+toggleStudentSelection(id: number) {
+  const index = this.group.student_ids.indexOf(id);
+
+  if (index > -1) {
+    this.group.student_ids.splice(index, 1);
+  } else {
+    this.group.student_ids.push(id);
+  }
+}
+
   isSelected(studentId: number): boolean {
     return this.group.student_ids.includes(studentId);
   }

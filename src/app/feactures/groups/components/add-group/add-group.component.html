@@ -1,8 +1,10 @@
 <section>
   <div class="row">
     <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
+
       <div class="card mb-4 shadow-sm p-3">
 
+        <!-- HEADER -->
         <div class="card-header py-3"
           style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);
                  border-radius: 13px 13px 0 0 !important;">
@@ -12,7 +14,9 @@
           </h5>
         </div>
 
+        <!-- BODY -->
         <div class="card-body">
+
           <form (ngSubmit)="submitGroup()" #groupForm="ngForm">
 
             <!-- Group Name -->
@@ -73,97 +77,93 @@
                 required>
             </div>
 
-            <!-- Assign Teacher with Search -->
+            <!-- 🔵 TEACHER -->
             <div class="mb-3">
               <label class="form-label fw-bold">Assign Teacher</label>
-              
-              <!-- Search input for teachers -->
-              <div class="mb-2">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search teacher by name..."
-                  [(ngModel)]="teacherSearch"
-                  [ngModelOptions]="{standalone: true}">
-                <small class="text-muted" *ngIf="filteredTeachers().length === 0">
-                  No teachers found matching "{{teacherSearch}}"
-                </small>
+
+              <!-- Buscador -->
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Buscar teacher..."
+                [(ngModel)]="teacherSearch"
+                [ngModelOptions]="{standalone: true}">
+
+              <small class="text-muted" *ngIf="filteredTeachers().length === 0">
+                No teachers found
+              </small>
+
+              <!-- Lista -->
+              <div class="list-group"
+                   style="max-height: 200px; overflow-y: auto;">
+
+                <label *ngFor="let t of filteredTeachers()"
+                       class="list-group-item">
+
+                  <input type="radio"
+                         name="teacherSelected"
+                         class="form-check-input me-2"
+                         [value]="t.teacher_id"
+                         [(ngModel)]="group.teacher_id">
+
+                  {{ t.displayName }}
+
+                </label>
+
               </div>
-
-              <!-- Teacher select with filtered options -->
-              <select
-                class="form-select"
-                name="teacher_id"
-                [(ngModel)]="group.teacher_id"
-                required>
-
-                <option [ngValue]="null" disabled selected>
-                  {{ filteredTeachers().length === 0 ? 'No teachers available' : 'Select a teacher' }}
-                </option>
-
-                <option
-                  *ngFor="let teacher of filteredTeachers()"
-                  [ngValue]="teacher.teacher_id">
-                  {{ teacher.displayName }}
-                </option>
-              </select>
             </div>
 
-            <!-- Assign Students with Search -->
+            <!-- 🟢 STUDENTS -->
             <div class="mb-3">
               <label class="form-label fw-bold">Assign Students</label>
-              
-              <!-- Search input for students -->
-              <div class="mb-2">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search students by name..."
-                  [(ngModel)]="studentSearch"
-                  [ngModelOptions]="{standalone: true}">
-                <small class="text-muted" *ngIf="filteredStudents().length === 0">
-                  No students found matching "{{studentSearch}}"
-                </small>
+
+              <!-- Buscador -->
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Buscar students..."
+                [(ngModel)]="studentSearch"
+                [ngModelOptions]="{standalone: true}">
+
+              <small class="text-muted" *ngIf="filteredStudents().length === 0">
+                No students found
+              </small>
+
+              <!-- Lista -->
+              <div class="list-group"
+                   style="max-height: 250px; overflow-y: auto;">
+
+                <label *ngFor="let s of filteredStudents()"
+                       class="list-group-item"
+                       [ngClass]="{'active': isStudentSelected(s.student_id)}">
+
+                  <input type="checkbox"
+                         class="form-check-input me-2"
+                         [checked]="isStudentSelected(s.student_id)"
+                         (change)="toggleStudentSelection(s.student_id)">
+
+                  {{ s.displayName }}
+
+                </label>
+
               </div>
 
-              <!-- Students multi-select with filtered options -->
-              <select
-                class="form-select"
-                multiple
-                name="student_ids"
-                [(ngModel)]="group.student_ids"
-                [size]="Math.min(filteredStudents().length, 6)"
-                style="min-height: 120px;">
-
-                <option
-                  *ngFor="let student of filteredStudents()"
-                  [ngValue]="student.student_id"
-                  [style.background]="isSelected(student.student_id) ? '#e3f2fd' : ''">
-                  {{ student.displayName }}
-                </option>
-              </select>
-
-              <div class="d-flex justify-content-between mt-2">
-                <small class="text-muted">
-                  Selected: {{ group.student_ids.length }} students
-                </small>
-                <small class="text-muted">
-                  Hold Ctrl (or Cmd) to select multiple
-                </small>
-              </div>
+              <small class="text-muted mt-2 d-block">
+                Selected: {{ group.student_ids.length }} students
+              </small>
             </div>
 
-            <!-- Error Message -->
+            <!-- Error -->
             <div *ngIf="errorMessage" class="alert alert-danger">
               {{ errorMessage }}
             </div>
 
-            <!-- Success Message -->
+            <!-- Success -->
             <div *ngIf="successMessage" class="alert alert-success">
               {{ successMessage }}
             </div>
 
-            <!-- Submit Button -->
+            <!-- Submit -->
             <button
               type="submit"
               class="btn btn-primary"
@@ -173,9 +173,11 @@
             </button>
 
           </form>
+
         </div>
 
       </div>
+
     </div>
   </div>
 </section>

@@ -182,22 +182,22 @@
 
             <td>
 
-              <span class="badge fs-6 px-3 py-2"
-              [ngClass]="{
-              'bg-success': g.grade >= 7,
-              'bg-warning text-dark': g.grade >=5 && g.grade <7,
-              'bg-danger': g.grade <5
-              }">
+            <span class="badge fs-6 px-3 py-2"
+            [ngClass]="{
+              'bg-success': g.score >= 7,
+              'bg-warning text-dark': g.score >=5 && g.score <7,
+              'bg-danger': g.score <5
+            }">
 
-              {{ g.grade }}
+              {{ g.score ?? 'N/A' }}
 
-              </span>
+            </span>
 
-            </td>
+          </td>
 
-            <td>{{ g.comment }}</td>
+            <td>{{ g.comments || 'No comment' }}</td>
 
-            <td>{{ g.createdAt | date:'short' }}</td>
+            <td>{{ g.createdAt ? (g.createdAt | date:'short') : 'No date' }}</td>
 
           </tr>
 

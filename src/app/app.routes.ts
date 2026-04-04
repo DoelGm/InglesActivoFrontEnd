@@ -14,8 +14,8 @@ import { TeachersComponent } from './feactures/admin/components/teachers/teacher
 import { AdminsComponent } from './feactures/admin/components/admins/admins.component';
 import { authGuard } from './guards/auth.guard';
 import { ForgotPasswordPageComponent } from './feactures/forgot-password/pages/forgot-password/forgot-password-page.component';
-import { GradesComponent } from './feactures/grades/services/grades/grades.component';
 import { MyGradesComponent } from './feactures/grades/components/my-grades/my-grades.component';
+import { AttendanceComponent } from './feactures/attendance/components/attendance/attendance.component';
 
 
 export const routes: Routes = [
@@ -32,6 +32,7 @@ export const routes: Routes = [
       { path: 'groups', component: GroupPageComponent },
       { path: 'groups/:id', component: GroupDetailComponent },
       { path: 'grades', component: MyGradesComponent },
+      { path: 'attendance', component: AttendanceComponent }
     ]
   },
 
@@ -51,6 +52,7 @@ export const routes: Routes = [
     { path: 'groups', component: GroupPageComponent },
     { path: 'groups/:id', component: GroupDetailComponent },
     { path: 'grades', component: MyGradesComponent },
+    { path: 'attendance', component: AttendanceComponent }
   ]
 }
 

@@ -38,19 +38,19 @@ export class SidebarComponent implements OnInit {
       this.links = [
         { label: 'Groups', route: '/admin/groups' },
         { label: 'Grades', route: '/admin/grades' },
-        { label: 'Attendance', route: '/student/grades'}
+        { label: 'Attendance', route: '/admin/attendance'}
       ];
     } else if (role === 'teacher') {
       this.links = [
         { label: 'Groups', route: '/teacher/groups' },
         { label: 'Grades', route: '/teacher/grades' },
-        { label: 'Attendance', route: '/student/grades'}
+        { label: 'Attendance', route: '/teacher/attendance'}
       ];
     } else if (role === 'student') {
       this.links = [
         { label: 'Groups', route: '/groups' },
         { label: 'Grades', route: '/grades' },
-        { label: 'Attendance', route: '/grades'}
+        { label: 'Attendance', route: '/attendance'}
       ];
     }
   }

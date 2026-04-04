@@ -119,6 +119,7 @@ export class MyGradesComponent implements OnInit {
                 next: (grades: any) => {
 
                   const grade = grades?.length ? grades[0] : null
+                  
 
                   this.studentsInGroup.push({
 
@@ -256,17 +257,14 @@ export class MyGradesComponent implements OnInit {
 
                   g.forEach((grade: any) => {
 
+                    console.log('GRADE BACK:', grade)
+
                     this.grades.push({
-
-                      ...grade,
-
                       groupName: e.group.name,
-                      score: grade.score,
+                      score: Number(grade.score), // 🔥 IMPORTANTE
                       comments: grade.comments,
                       createdAt: grade.date_recorded
-
                     })
-
                   })
 
                 }

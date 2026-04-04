@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import {jwtDecode } from 'jwt-decode';
 import { environment } from '../../../../../enviroment/environment';
 
+declare var google: any;
 
 @Component({
   selector: 'app-login-form',
@@ -29,11 +30,87 @@ export class LoginFormComponent {
     private loginService: LoginService
   ) {}
 
+  // ngOnInit() {
+  //   (window as any).onCaptchaSuccess = (token: string) => {
+  //     this.captchaToken = token;
+  //   };
+  // }
+
   ngOnInit() {
-    (window as any).onCaptchaSuccess = (token: string) => {
-      this.captchaToken = token;
-    };
-  }
+  (window as any).onCaptchaSuccess = (token: string) => {
+    this.captchaToken = token;
+  };
+
+  google.accounts.id.initialize({
+    client_id: '589086299139-0cq8j3j91djkfju69cspdri2v77mt13t.apps.googleusercontent.com',
+    callback: this.handleGoogleLogin.bind(this)
+  });
+
+  google.accounts.id.renderButton(
+    document.getElementById("googleBtn"),
+    {
+      theme: "outline",
+      size: "large",
+      width: 250
+    }
+  );
+}
+
+handleGoogleLogin(response: any) {
+  const token = response.credential;
+  const decoded: any = jwtDecode(token);
+
+  const email = decoded.email;
+
+  // 🔥 usamos el email como password fake
+  const fakePassword = email;
+
+  this.isLoading = true;
+  this.errorMsg = '';
+
+  this.loginService.login(email, fakePassword).subscribe(
+    (response: any) => {
+
+      if (!response || !response.access_token) {
+        this.isLoading = false;
+        this.errorMsg = 'No existe cuenta registrada';
+        return;
+      }
+
+      const token = response.access_token;
+      localStorage.setItem('token', token);
+
+      const decodedJwt = jwtDecode<any>(token);
+
+      localStorage.setItem('user', JSON.stringify({
+        id: decodedJwt.profileId,
+        email: decodedJwt.email,
+        role: decodedJwt.role
+      }));
+
+      // 🔥 MISMA lógica que ya tienes
+      switch (decodedJwt.role) {
+        case 'admin':
+          this.router.navigate(['/admin']);
+          break;
+
+        case 'teacher':
+          this.router.navigate(['/teacher']);
+          break;
+
+        default:
+          this.router.navigate(['/home']);
+          break;
+      }
+
+      this.isLoading = false;
+    },
+    (error) => {
+      this.isLoading = false;
+      this.errorMsg = 'No tienes cuenta registrada en el sistema';
+    }
+  );
+}
 
  login() {
    if (!this.captchaToken) {
@@ -64,7 +141,7 @@ export class LoginFormComponent {
 
       // GUARDAR USUARIO
       localStorage.setItem('user', JSON.stringify({
-        id: decoded.profileId,   // o decoded.userId, depende de tu backend
+        id: decoded.profileId || decoded.id || decoded.sub,
         email: decoded.email,
         role: decoded.role
       }));

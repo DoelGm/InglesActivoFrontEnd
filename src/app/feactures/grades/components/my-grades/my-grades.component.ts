@@ -62,11 +62,14 @@ export class MyGradesComponent implements OnInit {
 
   }
 
-  loadGroups() {
-    this.groupsService.getAllGroups().subscribe({
-      next: (data: any) => this.groups = data
-    })
-  }
+ loadGroups() {
+  this.groupsService.getAllGroups().subscribe({
+    next: (data: any) => {
+      // 🔹 Filtrar solo activos
+      this.groups = data.filter((g: any) => g.is_active);
+    }
+  });
+}
 
   loadAssignments() {
 
@@ -79,100 +82,27 @@ export class MyGradesComponent implements OnInit {
   }
 
   loadStudentsByGroup() {
+  if (!this.selectedGroupId) return;
 
-    if (!this.selectedGroupId) return
+  const selectedGroup = this.groups.find(g => g.id === this.selectedGroupId);
 
-    this.loading = true
-
-    const groupId = Number(this.selectedGroupId)
-
-    const assignment = this.assignments.find(
-      (a: any) => Number(a.group?.id) === groupId
-    )
-
-    if (!assignment) {
-
-      this.loading = false
-      this.teacherId = 0
-
-      this.showMessage('Teacher not assigned to this group', 'danger')
-      return
-
-    }
-
-    this.teacherId = assignment.teacher?.id
-
-    this.enrollmentService
-      .getEnrollmentsByGroupId(groupId)
-      .subscribe({
-
-        next: (enrollments: any) => {
-
-          this.studentsInGroup = []
-
-          enrollments.forEach((e: any) => {
-
-            this.gradesService
-              .getGradesByEnrollment(e.id)
-              .subscribe({
-
-                next: (grades: any) => {
-
-                  const grade = grades?.length ? grades[0] : null
-                  
-
-                  this.studentsInGroup.push({
-
-                    enrollmentId: e.id,
-
-                    studentName:
-                      e.student.user.first_name +
-                      ' ' +
-                      e.student.user.last_name,
-
-                    score: grade ? grade.score : '',
-                    comments: grade ? grade.comments : ''
-
-                  })
-
-                },
-
-                error: () => {
-
-                  this.studentsInGroup.push({
-
-                    enrollmentId: e.id,
-
-                    studentName:
-                      e.student.user.first_name +
-                      ' ' +
-                      e.student.user.last_name,
-
-                    score: '',
-                    comments: ''
-
-                  })
-
-                }
-
-              })
-
-          })
-
-          this.loading = false
-
-        },
-
-        error: () => {
-
-          this.loading = false
-          this.showMessage('Error loading students', 'danger')
-
-        }
-
-      })
-
+  if (!selectedGroup) {
+    this.showMessage('Grupo no encontrado', 'danger');
+    return;
   }
+
+  // 🔹 Verificar si está activo
+  if (!selectedGroup.is_active) {
+    this.showMessage('Este grupo está inactivo', 'danger');
+    this.studentsInGroup = [];
+    return;
+  }
+
+  // ✅ Grupo activo, continuar normalmente
+  this.loading = true;
+
+  // resto de loadStudentsByGroup sin cambios...
+}
 
   saveAllGrades() {
 

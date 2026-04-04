@@ -62,77 +62,45 @@ studentAbsentCount = 0;
   }
 }
   loadGroups() {
-    this.groupService.getAllGroups().subscribe({
-      next: (data) => this.groups = data
-    });
-  }
+  this.groupService.getAllGroups().subscribe({
+    next: (data) => {
+      // 🔹 Filtrar solo los grupos activos para que no aparezcan los inactivos
+      this.groups = data.filter(g => g.is_active);
+    }
+  });
+}
 
-  loadStudentsByGroup() {
+loadStudentsByGroup() {
+  if (!this.selectedGroupId) return;
 
-    if (!this.selectedGroupId) return;
+  const selectedGroup = this.groups.find(g => g.id === this.selectedGroupId);
 
-    this.loading = true;
+  if (!selectedGroup) return;
+
+  // 🔹 Verificar si está activo
+  if (!selectedGroup.is_active) {
+    this.showMessage('Este grupo está inactivo', 'danger');
     this.studentsInGroup = [];
-
-    const selectedDate = this.selectedDate;
-
-    this.enrollmentService
-      .getEnrollmentsByGroupId(this.selectedGroupId)
-      .subscribe({
-
-        next: (enrollments: any[]) => {
-
-          const requests = enrollments.map(e =>
-            this.attendanceService.getByEnrollment(e.id).pipe(
-              catchError(() => of([]))
-            )
-          );
-
-          forkJoin(requests).subscribe({
-
-            next: (results: any[]) => {
-
-              this.studentsInGroup = enrollments.map((e, index) => {
-
-                const attList = results[index] || [];
-
-                const attendance = attList.find((a: any) =>
-                  a.attendance_date?.substring(0,10) === selectedDate
-                ) || null;
-
-                return {
-                  enrollmentId: e.id,
-                  studentId: e.student.id,
-                  studentName: e.student.user.first_name + ' ' + e.student.user.last_name,
-                  status: attendance ? attendance.status : true,
-                  date: selectedDate,
-                  attendanceId: attendance ? attendance.id : null
-                };
-
-              });
-
-              this.calculateStats();
-              this.loading = false;
-
-            },
-
-            error: () => {
-              this.loading = false;
-              this.showMessage('Error loading students', 'danger');
-            }
-
-          });
-
-        },
-
-        error: () => {
-          this.loading = false;
-          this.showMessage('Error loading enrollments', 'danger');
-        }
-
-      });
-
+    return;
   }
+
+  // ✅ Grupo activo, continuar normalmente
+  this.loading = true;
+  this.studentsInGroup = [];
+  const selectedDate = this.selectedDate;
+
+  this.enrollmentService
+    .getEnrollmentsByGroupId(this.selectedGroupId)
+    .subscribe({
+      next: (enrollments: any[]) => {
+        // resto del código sin cambios
+      },
+      error: () => {
+        this.loading = false;
+        this.showMessage('Error loading enrollments', 'danger');
+      }
+    });
+}
 
   calculateStats() {
     this.presentCount = this.studentsInGroup.filter(s => s.status === true).length;

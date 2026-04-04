@@ -19,7 +19,7 @@
       class="btn btn-danger"
       [disabled]="selectedGroups.length === 0"
       (click)="openMultiDeleteModal()">
-      Eliminar seleccionados
+      Eliminar seleccionados ({{ selectedGroups.length }})
     </button>
   </div>
 
@@ -31,55 +31,83 @@
 
       <div
         class="card shadow-sm h-100"
-        (click)="goToGroup(group.id!)">
+        [ngClass]="{'disabled-group': !group.is_active}">
 
         <!-- Checkbox solo admin -->
         <div class="text-end p-2" *ngIf="isAdmin">
           <input
             type="checkbox"
+            class="form-check-input"
             (click)="$event.stopPropagation()"
+            [checked]="selectedGroups.includes(group.id!)"
             (change)="toggleSelection(group.id!, $event)">
         </div>
 
-        <!-- Logo -->
-        <div
-          class="mx-auto d-flex align-items-center justify-content-center mb-3 rounded-circle"
-          [ngStyle]="{
-            'background-color': colors[i],
-            'width': '120px',
-            'height': '120px',
-            'font-size': '28px',
-            'color': 'white',
-            'margin-top': '15px'
-          }">
-          {{ getInitials(group.name) }}
-        </div>
+        <!-- Área clickeable -->
+        <div 
+          class="clickable-area"
+          [style.cursor]="group.is_active ? 'pointer' : 'default'"
+          (click)="group.is_active && goToGroup(group.id!)">
+          
+          <!-- Logo -->
+          <div
+            class="mx-auto d-flex align-items-center justify-content-center mb-3 rounded-circle"
+            [ngStyle]="{
+              'background-color': colors[i],
+              'width': '120px',
+              'height': '120px',
+              'font-size': '28px',
+              'color': 'white',
+              'margin-top': '15px'
+            }">
+            {{ getInitials(group.name) }}
+          </div>
 
-        <!-- Nombre -->
-        <div class="card-header text-center">
-          <h5 class="mb-0">{{ group.name }}</h5>
-        </div>
+          <!-- Nombre -->
+          <div class="card-header text-center">
+            <h5 class="mb-0">{{ group.name }}</h5>
+          </div>
 
-        <!-- Descripción -->
-        <div class="card-body text-center">
-          <p>{{ group.description }}</p>
+          <!-- Descripción -->
+          <div class="card-body text-center">
+            <p>{{ group.description }}</p>
+          </div>
+
+          <!-- Fechas -->
+          <div class="text-center small text-muted mb-2">
+            <div *ngIf="group.start_date">
+              <i class="bi bi-calendar-check"></i> Inicio: {{ group.start_date | date:'dd/MM/yyyy' }}
+            </div>
+            <div *ngIf="group.end_date">
+              <i class="bi bi-calendar-x"></i> Fin: {{ group.end_date | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
+
+          <!-- Badge estado -->
+          <div class="text-center mb-2">
+            <span 
+              class="badge"
+              [ngClass]="group.is_active ? 'bg-success' : 'bg-secondary'">
+              <i class="bi" [ngClass]="group.is_active ? 'bi-check-circle' : 'bi-clock-history'"></i>
+              {{ group.is_active ? 'Activo' : 'Vencido / Inactivo' }}
+            </span>
+          </div>
+
         </div>
 
         <!-- BOTONES ADMIN -->
         <div class="text-center mb-3" *ngIf="isAdmin">
-
           <button
             class="btn btn-outline-primary btn-sm me-2"
             (click)="openEditModal(group, $event)">
-            Editar
+            <i class="bi bi-pencil"></i> Editar
           </button>
 
           <button
             class="btn btn-outline-danger btn-sm"
             (click)="openDeleteModal(group, $event)">
-            Eliminar
+            <i class="bi bi-trash"></i> Eliminar
           </button>
-
         </div>
 
       </div>
@@ -91,16 +119,17 @@
 <!-- ========================= -->
 <!-- MODAL EDITAR -->
 <!-- ========================= -->
-
 <div class="modal fade show"
      *ngIf="groupToEdit"
-     style="display:block;background:rgba(0,0,0,0.5);">
+     style="display:block;background:rgba(0,0,0,0.5);z-index:1050;">
 
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content rounded-4 shadow">
 
       <div class="modal-header bg-primary text-white rounded-top-4">
-        <h6 class="modal-title">Editar grupo</h6>
+        <h5 class="modal-title">
+          <i class="bi bi-pencil-square"></i> Editar grupo
+        </h5>
         <button type="button"
                 class="btn-close btn-close-white"
                 (click)="closeEditModal()"></button>
@@ -109,20 +138,48 @@
       <div class="modal-body">
 
         <div class="mb-3">
-          <label class="form-label">Nombre</label>
+          <label class="form-label fw-bold">Nombre del grupo</label>
           <input
             type="text"
             class="form-control"
-            [(ngModel)]="editData.name">
+            [(ngModel)]="editData.name"
+            placeholder="Nombre del grupo">
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Descripción</label>
+          <label class="form-label fw-bold">Descripción</label>
           <textarea
             class="form-control"
             rows="3"
-            [(ngModel)]="editData.description">
+            [(ngModel)]="editData.description"
+            placeholder="Descripción del grupo">
           </textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Fecha de inicio</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="editData.start_date">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Fecha de fin</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="editData.end_date">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Capacidad</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="editData.capacity"
+            min="1">
         </div>
 
       </div>
@@ -130,12 +187,12 @@
       <div class="modal-footer">
         <button class="btn btn-outline-secondary"
                 (click)="closeEditModal()">
-          Cancelar
+          <i class="bi bi-x-circle"></i> Cancelar
         </button>
 
         <button class="btn btn-primary"
                 (click)="saveEdit()">
-          Guardar cambios
+          <i class="bi bi-save"></i> Guardar cambios
         </button>
       </div>
 
@@ -146,24 +203,28 @@
 <!-- ========================= -->
 <!-- MODAL ELIMINAR INDIVIDUAL -->
 <!-- ========================= -->
-
 <div class="modal fade show"
      *ngIf="groupToDelete"
-     style="display:block;background:rgba(0,0,0,0.5);">
+     style="display:block;background:rgba(0,0,0,0.5);z-index:1050;">
 
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content rounded-4 shadow">
 
       <div class="modal-header bg-danger text-white rounded-top-4">
-        <h6 class="modal-title">Confirmar eliminación</h6>
+        <h5 class="modal-title">
+          <i class="bi bi-exclamation-triangle"></i> Confirmar eliminación
+        </h5>
         <button type="button"
                 class="btn-close btn-close-white"
                 (click)="closeDeleteModal()"></button>
       </div>
 
       <div class="modal-body text-center">
-        <p>¿Eliminar el grupo:</p>
-        <strong>{{ groupToDelete.name }}</strong>
+        <p>¿Estás seguro de eliminar el grupo?</p>
+        <div class="alert alert-danger">
+          <strong>{{ groupToDelete.name }}</strong>
+        </div>
+        <p class="text-muted small">Esta acción no se puede deshacer.</p>
       </div>
 
       <div class="modal-footer justify-content-center">
@@ -174,7 +235,7 @@
 
         <button class="btn btn-danger"
                 (click)="deleteConfirmed()">
-          Eliminar
+          <i class="bi bi-trash"></i> Eliminar
         </button>
       </div>
 
@@ -185,24 +246,28 @@
 <!-- ========================= -->
 <!-- MODAL ELIMINAR MÚLTIPLE -->
 <!-- ========================= -->
-
 <div class="modal fade show"
      *ngIf="showMultiDeleteModal"
-     style="display:block;background:rgba(0,0,0,0.5);">
+     style="display:block;background:rgba(0,0,0,0.5);z-index:1050;">
 
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content rounded-4 shadow">
 
       <div class="modal-header bg-danger text-white rounded-top-4">
-        <h6 class="modal-title">Eliminar múltiples grupos</h6>
+        <h5 class="modal-title">
+          <i ></i> Eliminar múltiples grupos
+        </h5>
         <button type="button"
                 class="btn-close btn-close-white"
                 (click)="closeMultiDeleteModal()"></button>
       </div>
 
       <div class="modal-body text-center">
-        <p>Se eliminarán:</p>
-        <strong>{{ selectedGroups.length }} grupos</strong>
+        <p>¿Estás seguro de eliminar los siguientes grupos?</p>
+        <div class="alert alert-danger">
+          <strong>{{ selectedGroups.length }} grupos seleccionados</strong>
+        </div>
+        <p class="text-muted small">Esta acción no se puede deshacer.</p>
       </div>
 
       <div class="modal-footer justify-content-center">
@@ -213,7 +278,7 @@
 
         <button class="btn btn-danger"
                 (click)="deleteMultipleConfirmed()">
-          Eliminar
+          <i class="bi bi-check-circle"></i> Eliminar todos
         </button>
       </div>
 

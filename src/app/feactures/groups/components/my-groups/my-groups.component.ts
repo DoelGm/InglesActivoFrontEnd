@@ -7,7 +7,6 @@ import { GroupService, Group } from '../../service/groups/group.service';
 import { EnrollmentService } from '../../service/enrollment/enrollment.service';
 import { TeacherAssignmentService } from '../../service/teachers-assignment/teacher-assignment.service';
 
-
 @Component({
   selector: 'app-my-groups',
   standalone: true,
@@ -31,7 +30,10 @@ export class MyGroupsComponent implements OnInit {
   groupToEdit: Group | null = null;
   editData: Partial<Group> = {
     name: '',
-    description: ''
+    description: '',
+    start_date: '',
+    end_date: '',
+    capacity: 1
   };
 
   constructor(
@@ -57,39 +59,31 @@ export class MyGroupsComponent implements OnInit {
     }
   }
 
-
   loadAllGroups() {
     this.groupService.getAllGroups().subscribe({
-      next: (res) => {
-        this.setGroups(res);
-      },
+      next: (res) => this.setGroups(res),
       error: (err) => console.error(err)
     });
   }
 
   loadStudentGroups(studentId: number) {
     this.enrollmentService.getByStudent(studentId).subscribe({
-      next: (res) => {
-        const groups = res.map(e => e.group);
-        this.setGroups(groups);
-      },
+      next: (res) => this.setGroups(res.map(e => e.group)),
       error: (err) => console.error(err)
     });
   }
 
   loadTeacherGroups(teacherId: number) {
-  this.teacherAssignmentService.getAssignments().subscribe({
-    next: (res) => {
-      // Filtrar solo las asignaciones del teacher logeado
-      const myAssignments = res.filter(a => a.teacher.id === teacherId);
-
-      const groups = myAssignments.map(a => a.group);
-
-      this.setGroups(groups);
-    },
-    error: (err) => console.error(err)
-  });
-}
+    this.teacherAssignmentService.getAssignments().subscribe({
+      next: (res) => {
+        const myGroups = res
+          .filter(a => a.teacher.id === teacherId)
+          .map(a => a.group);
+        this.setGroups(myGroups);
+      },
+      error: (err) => console.error(err)
+    });
+  }
 
   setGroups(groups: Group[]) {
     this.groups = groups;
@@ -97,15 +91,12 @@ export class MyGroupsComponent implements OnInit {
     this.colors = this.groups.map(() => this.getRandomColor());
   }
 
-  // =====================
   // 🔎 FILTRO
-  // =====================
-
   filterGroups() {
     const term = this.filterText.toLowerCase();
-    this.filteredGroups =
-      this.groups.filter(g =>
-        g.name.toLowerCase().includes(term));
+    this.filteredGroups = this.groups.filter(g =>
+      g.name.toLowerCase().includes(term)
+    );
   }
 
   goToGroup(groupId: number) {
@@ -113,31 +104,24 @@ export class MyGroupsComponent implements OnInit {
   }
 
   getRandomColor(): string {
-    const colors = [
-      '#FF6B6B','#6BCB77','#4D96FF','#FFD93D',
-      '#845EC2','#FF9671','#008F7A',
-      '#FFC75F','#F9F871','#D65DB1'
-    ];
+    const colors = ['#FF6B6B','#6BCB77','#4D96FF','#FFD93D','#845EC2','#FF9671','#008F7A','#FFC75F','#F9F871','#D65DB1'];
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
   getInitials(name: string): string {
-    return name.split(' ')
-      .map(w => w[0])
-      .join('')
-      .toUpperCase();
+    return name.split(' ').map(w => w[0]).join('').toUpperCase();
   }
 
-  // =====================
   // 📝 EDITAR
-  // =====================
-
   openEditModal(group: Group, event: Event) {
     event.stopPropagation();
     this.groupToEdit = group;
     this.editData = {
       name: group.name,
-      description: group.description
+      description: group.description,
+      start_date: group.start_date ? this.formatDate(group.start_date) : '',
+      end_date: group.end_date ? this.formatDate(group.end_date) : '',
+      capacity: group.capacity || 1
     };
   }
 
@@ -153,10 +137,7 @@ export class MyGroupsComponent implements OnInit {
       this.editData
     ).subscribe({
       next: (updated) => {
-        const index =
-          this.groups.findIndex(g =>
-            g.id === updated.id);
-
+        const index = this.groups.findIndex(g => g.id === updated.id);
         this.groups[index] = updated;
         this.filteredGroups = [...this.groups];
         this.closeEditModal();
@@ -165,10 +146,15 @@ export class MyGroupsComponent implements OnInit {
     });
   }
 
-  // =====================
-  // 🗑 ELIMINAR INDIVIDUAL
-  // =====================
+  formatDate(date: string | Date): string {
+    const d = new Date(date);
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  }
 
+  // 🗑 ELIMINAR INDIVIDUAL
   openDeleteModal(group: Group, event: Event) {
     event.stopPropagation();
     this.groupToDelete = group;
@@ -181,14 +167,9 @@ export class MyGroupsComponent implements OnInit {
   deleteConfirmed() {
     if (!this.groupToDelete) return;
 
-    this.groupService.deleteGroup(
-      this.groupToDelete.id!
-    ).subscribe({
+    this.groupService.deleteGroup(this.groupToDelete.id!).subscribe({
       next: () => {
-        this.groups =
-          this.groups.filter(g =>
-            g.id !== this.groupToDelete!.id);
-
+        this.groups = this.groups.filter(g => g.id !== this.groupToDelete!.id);
         this.filteredGroups = [...this.groups];
         this.groupToDelete = null;
       },
@@ -196,18 +177,13 @@ export class MyGroupsComponent implements OnInit {
     });
   }
 
-  // =====================
   // 🗑 ELIMINAR MÚLTIPLE
-  // =====================
-
   toggleSelection(id: number, event: any) {
     event.stopPropagation();
-
     if (event.target.checked) {
-      this.selectedGroups.push(id);
+      if (!this.selectedGroups.includes(id)) this.selectedGroups.push(id);
     } else {
-      this.selectedGroups =
-        this.selectedGroups.filter(g => g !== id);
+      this.selectedGroups = this.selectedGroups.filter(g => g !== id);
     }
   }
 
@@ -220,17 +196,10 @@ export class MyGroupsComponent implements OnInit {
   }
 
   deleteMultipleConfirmed() {
-    const requests =
-      this.selectedGroups.map(id =>
-        this.groupService.deleteGroup(id)
-      );
-
+    const requests = this.selectedGroups.map(id => this.groupService.deleteGroup(id));
     forkJoin(requests).subscribe({
       next: () => {
-        this.groups =
-          this.groups.filter(g =>
-            !this.selectedGroups.includes(g.id!));
-
+        this.groups = this.groups.filter(g => !this.selectedGroups.includes(g.id!));
         this.filteredGroups = [...this.groups];
         this.selectedGroups = [];
         this.showMultiDeleteModal = false;

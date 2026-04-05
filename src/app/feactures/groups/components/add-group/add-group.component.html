@@ -1,0 +1,183 @@
+<section>
+  <div class="row">
+    <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
+
+      <div class="card mb-4 shadow-sm p-3">
+
+        <!-- HEADER -->
+        <div class="card-header py-3"
+          style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);
+                 border-radius: 13px 13px 0 0 !important;">
+          <h5 class="mb-0 text-white fw-bold">
+            <i class="bi bi-person-plus-fill me-2"></i>
+            Create New Group
+          </h5>
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body">
+
+          <form (ngSubmit)="submitGroup()" #groupForm="ngForm">
+
+            <!-- Group Name -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Group Name</label>
+              <input
+                type="text"
+                class="form-control"
+                name="name"
+                [(ngModel)]="group.name"
+                required
+                placeholder="Enter group name">
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Group Description</label>
+              <textarea
+                class="form-control"
+                name="description"
+                [(ngModel)]="group.description"
+                rows="3"
+                placeholder="Enter group description">
+              </textarea>
+            </div>
+
+            <!-- Start Date -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Start Date</label>
+              <input
+                type="date"
+                class="form-control"
+                name="start_date"
+                [(ngModel)]="group.start_date"
+                required>
+            </div>
+
+            <!-- End Date -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">End Date</label>
+              <input
+                type="date"
+                class="form-control"
+                name="end_date"
+                [(ngModel)]="group.end_date"
+                required>
+            </div>
+
+            <!-- Capacity -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Capacity</label>
+              <input
+                type="number"
+                class="form-control"
+                name="capacity"
+                [(ngModel)]="group.capacity"
+                min="1"
+                required>
+            </div>
+
+            <!-- 🔵 TEACHER -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Assign Teacher</label>
+
+              <!-- Buscador -->
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Buscar teacher..."
+                [(ngModel)]="teacherSearch"
+                [ngModelOptions]="{standalone: true}">
+
+              <small class="text-muted" *ngIf="filteredTeachers().length === 0">
+                No teachers found
+              </small>
+
+              <!-- Lista -->
+              <div class="list-group"
+                   style="max-height: 200px; overflow-y: auto;">
+
+                <label *ngFor="let t of filteredTeachers()"
+                       class="list-group-item">
+
+                  <input type="radio"
+                         name="teacherSelected"
+                         class="form-check-input me-2"
+                         [value]="t.teacher_id"
+                         [(ngModel)]="group.teacher_id">
+
+                  {{ t.displayName }}
+
+                </label>
+
+              </div>
+            </div>
+
+            <!-- 🟢 STUDENTS -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Assign Students</label>
+
+              <!-- Buscador -->
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Buscar students..."
+                [(ngModel)]="studentSearch"
+                [ngModelOptions]="{standalone: true}">
+
+              <small class="text-muted" *ngIf="filteredStudents().length === 0">
+                No students found
+              </small>
+
+              <!-- Lista -->
+              <div class="list-group"
+                   style="max-height: 250px; overflow-y: auto;">
+
+                <label *ngFor="let s of filteredStudents()"
+                       class="list-group-item"
+                       [ngClass]="{'active': isStudentSelected(s.student_id)}">
+
+                  <input type="checkbox"
+                         class="form-check-input me-2"
+                         [checked]="isStudentSelected(s.student_id)"
+                         (change)="toggleStudentSelection(s.student_id)">
+
+                  {{ s.displayName }}
+
+                </label>
+
+              </div>
+
+              <small class="text-muted mt-2 d-block">
+                Selected: {{ group.student_ids.length }} students
+              </small>
+            </div>
+
+            <!-- Error -->
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+
+            <!-- Success -->
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="submitting || groupForm.invalid">
+
+              {{ submitting ? 'Submitting...' : 'Add Group' }}
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>

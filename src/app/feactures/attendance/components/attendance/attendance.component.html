@@ -1,0 +1,197 @@
+<section>
+<div class="container mt-4">
+
+<!-- ALERT -->
+<div *ngIf="message"
+     class="alert mt-3"
+     [ngClass]="{
+       'alert-success': messageType === 'success',
+       'alert-danger': messageType === 'danger'
+     }">
+  {{ message }}
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading" class="text-center my-5">
+  <div class="spinner-border text-primary"></div>
+</div>
+
+<!-- SELECT GROUP + DATE -->
+<div *ngIf="userRole !== 'student'" class="card shadow-sm mb-4">
+
+  <div class="card-header text-white"
+       style="background: linear-gradient(135deg,#003143 0%,#5fb3f7 100%);">
+    <h5>Select Group</h5>
+  </div>
+
+  <div class="card-body">
+
+    <div class="row g-2">
+
+      <!-- Grupo -->
+      <div class="col-md-6">
+        <select class="form-select"
+                [(ngModel)]="selectedGroupId"
+                (change)="loadStudentsByGroup()">
+
+          <option [ngValue]="null">Select group</option>
+
+          <option *ngFor="let g of groups" [ngValue]="g.id">
+            {{ g.name }}
+          </option>
+
+        </select>
+      </div>
+
+      <!-- 🔥 Fecha -->
+      <div class="col-md-6">
+        <input type="date"
+               class="form-control"
+               [(ngModel)]="selectedDate"
+               (change)="loadStudentsByGroup()">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- CONTADOR -->
+<div *ngIf="studentsInGroup.length > 0 && userRole !== 'student'" class="mb-3">
+  <span class="badge bg-success me-2">
+    Present: {{ presentCount }}
+  </span>
+  <span class="badge bg-danger">
+    Absent: {{ absentCount }}
+  </span>
+</div>
+
+<!-- TABLE STUDENTS -->
+<div *ngIf="studentsInGroup.length > 0 && userRole !== 'student'"
+     class="card shadow-sm">
+
+  <div class="card-header text-white"
+       style="background: linear-gradient(135deg,#003143 0%,#5fb3f7 100%);">
+    <h5>Attendance List</h5>
+  </div>
+
+  <div class="card-body">
+
+    <table class="table table-hover">
+
+      <thead class="table-light">
+        <tr>
+          <th>Student</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let s of studentsInGroup">
+
+          <td>{{ s.studentName }}</td>
+
+          <td>
+            <select [(ngModel)]="s.status"
+                    (change)="calculateStats()"
+                    class="form-select">
+              <option [ngValue]="true">Present</option>
+              <option [ngValue]="false">Absent</option>
+            </select>
+          </td>
+
+          <td>
+            <input type="date"
+                   [(ngModel)]="s.date"
+                   class="form-control">
+          </td>
+
+          <td>
+            <button class="btn btn-danger btn-sm"
+                    (click)="deleteAttendance(s.attendanceId)">
+              Delete
+            </button>
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <div class="text-end mt-3">
+      <button class="btn btn-success"
+              (click)="saveAllAttendance()">
+        Save Attendance
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- STUDENT VIEW -->
+<div *ngIf="userRole === 'student'"
+     class="card shadow-sm">
+
+  <div class="card-header text-white"
+       style="background: linear-gradient(135deg,#003143 0%,#5fb3f7 100%);">
+    <h5>My Attendance</h5>
+  </div>
+
+  <!-- CONTADOR STUDENT -->
+<div *ngIf="userRole === 'student' && myAttendances.length > 0" class="mb-2 mt-2 ms-2" >
+  <span class="badge bg-success me-2">
+    Present: {{ studentPresentCount }}
+  </span>
+  <span class="badge bg-danger">
+    Absent: {{ studentAbsentCount }}
+  </span>
+</div>
+
+  <div class="card-body">
+
+    <table class="table table-hover">
+
+      <thead class="table-light">
+        <tr>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Group</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let a of myAttendances">
+
+          <td>
+            <span class="badge"
+            [ngClass]="{
+              'bg-success': a.status === true,
+              'bg-danger': a.status === false
+            }">
+              {{ a.status ? 'Present' : 'Absent' }}
+            </span>
+          </td>
+
+          <td>{{ a.attendance_date | date:'shortDate' }}</td>
+
+          <td>{{ a.enrollment?.group?.name }}</td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+</div>
+</section>

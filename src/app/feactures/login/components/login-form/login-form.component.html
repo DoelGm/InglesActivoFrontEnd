@@ -5,22 +5,57 @@
                     <h4 class="text-center mb-2" style="color: #049FFF">Welcome to Ingles Activo</h4>
                     <span class="text-secondary small text-center d-block">Login to access your travelwise account</span>
 
-                    <form class="mt-4">
+                      <form class="mt-4" (ngSubmit)="login()">
+
                         <!-- Email Input -->
                         <div class="mb-3 floating-label-container">
                             <div class="form-control position-relative p-0" style="background: transparent; border: none;">
                                 <label for="email" class="floating-label">Email</label>
-                                <input type="email" class="floating-input w-100 rounded" id="email" placeholder="nombre@ejemplo.com" required style="padding-left: 12px; padding-right: 12px;">
+                                <input
+                type="email"
+                class="floating-input w-100 rounded"
+                id="email"
+                name="email"
+                [(ngModel)]="email"
+                placeholder="nombre@ejemplo.com"
+                required
+                style="padding-left: 12px; padding-right: 12px;"
+              />
                             </div>
                         </div>
 
-                        <!-- Password Input -->
-                        <div class="mb-3 floating-label-container">
-                            <div class="form-control position-relative p-0" style="background: transparent; border: none;">
-                                <label for="password" class="floating-label">Password</label>
-                                <input type="password" class="floating-input w-100 rounded" id="password" placeholder="••••••••" required style="padding-left: 12px; padding-right: 12px;">
-                            </div>
-                        </div>
+                <!-- Password Input -->
+                <div class="mb-3 floating-label-container">
+                <div class="form-control position-relative p-0"
+                    style="background: transparent; border: none;">
+
+                    <label for="password" class="floating-label">Password</label>
+
+                    <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="floating-input w-100 rounded"
+                    id="password"
+                    name="password"
+                    [(ngModel)]="password"
+                    placeholder="••••••••"
+                    required
+                    style="padding-left: 12px; padding-right: 42px;"
+                    />
+
+                    <!-- OJITO -->
+                    <button
+                    type="button"
+                    class="btn position-absolute top-50 end-0 translate-middle-y me-2 p-0"
+                    (click)="showPassword = !showPassword"
+                    tabindex="-1"
+                    style="border: none; background: transparent;">
+                    <i class="bi"
+                        [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+
+                </div>
+                </div>
+
 
                         <!-- Remember me & Forgot password -->
                         <div class="row mb-3">
@@ -33,12 +68,46 @@
                                 </div>
                             </div>
                             <div class="col-6 text-end">
-                                <a href="#" class="text-decoration-none small" style="color: #ff0404;">Forgot password?</a>
+                                <a href="/forgotPassword" class="text-decoration-none small" style="color: #ff0404;">Forgot password?</a>
                             </div>
                         </div>
 
+                        <!-- reCAPTCHA -->
+
+                        <div class="mb-3 text-center">
+                        <div
+                            class="g-recaptcha"
+                            [attr.data-sitekey]="siteKey"
+                            data-callback="onCaptchaSuccess">
+                        </div>
+                        </div>
+
+
+
+                                 <!-- Mensaje de Error -->
+                    <div *ngIf="errorMsg" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span>{{ errorMsg }}</span>
+                        </div>
+                        <button type="button" class="btn-close" (click)="errorMsg = ''" aria-label="Close"></button>
+                    </div>
+
                         <!-- Login Button -->
-                        <button type="button" class="btn btn-custom w-100 mb-3" (click)="goHome()">Login</button>
+                    <button 
+                        type="submit" 
+                        class="btn btn-custom w-100 mb-3"
+                        [disabled]="isLoading"
+                    >
+                        <span *ngIf="!isLoading">Login</span>
+                        <span *ngIf="isLoading">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Verificando...
+                        </span>
+                    </button>
+
+                    <!--div id="googleBtn"></div-->
+
                     </form>
                 </div>
             </div>

@@ -1,0 +1,73 @@
+<section>
+  <div class="row">
+    <div class="card shadow-sm mb-3 mt-4 bg-body-secondary rounded bg-opacity-50 text-dark p-3">
+      <div class="card mb-4 shadow-sm p-3">
+        <div class="card-header py-3" style="background: linear-gradient(135deg, #00BBFF 0%, #5fb3f7 100%);border-radius: 13px 13px 0 0 !important;">
+          <h5 class="mb-0 text-white fw-bold d-flex justify-content-between align-items-center">
+            <span>
+              <i class="bi bi-newspaper me-2"></i>Add News
+            </span>
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <form>
+            <!-- News title -->
+            <div class="mb-3">
+              <label for="newsTitle" class="form-label fw-bold">News Title</label>
+              <input
+                type="text"
+                class="form-control"
+                id="newsTitle"
+                placeholder="Enter news title"
+              />
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+              <label for="newsCategory" class="form-label fw-bold">Category</label>
+              <select class="form-select" id="newsCategory">
+                <option selected>Select a category</option>
+                <option value="1">General</option>
+                <option value="2">Events</option>
+                <option value="3">Announcements</option>
+              </select>
+            </div>
+
+            <!-- Image -->
+            <div>
+              <label for="newsImage" class="form-label fw-bold mt-2">News Image</label>
+              <input type="file" class="form-control mt-2" id="newsImage" />
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3 mt-3">
+              <label for="newsDescription" class="form-label fw-bold">Short Description</label>
+              <textarea
+                class="form-control"
+                id="newsDescription"
+                rows="2"
+                placeholder="Brief summary of the news"
+              ></textarea>
+            </div>
+
+            <!-- Content -->
+            <div class="mb-3">
+              <label for="newsContent" class="form-label fw-bold">Full Content</label>
+              <textarea
+                class="form-control"
+                id="newsContent"
+                rows="4"
+                placeholder="Write the full news content"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-circle me-1"></i>Publish News
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

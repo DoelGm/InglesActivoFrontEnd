@@ -1,3 +1,31 @@
 html, body {
   height: 100%;
 }
+
+/* Efecto al hacer clic (mientras mantienes presionado) */
+.nav-link:active {
+  background-color: #b3e5fc !important;
+  color: #0d6efd !important;
+  border-radius: 4px;
+}
+
+/* Efecto hover (al pasar el mouse) */
+.nav-link:hover {
+  background-color: #e3f2fd !important;
+  color: #0d6efd !important;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+.nav-link {
+  position: relative;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.nav-link:hover {
+  transform: translateY(-3px);
+  background: rgba(13,110,253,.08);
+  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+}

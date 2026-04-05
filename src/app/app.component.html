@@ -1,1 +1,6 @@
+<!--div id="google_translate_element"></div-->
+<ng-container *ngIf="loaderService.loading$ | async as loading">
+  <app-loader *ngIf="loading"></app-loader>
+</ng-container>
+
 <router-outlet></router-outlet>
